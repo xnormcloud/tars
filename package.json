@@ -1,0 +1,33 @@
+{
+  "name": "xnorm-cloud",
+  "version": "0.0.1",
+  "description": "Web & DiscordBot for https://xnorm.cloud behaviour",
+  "main": "server.js",
+  "scripts": {
+    "test": "nodemon ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xnormnet/xnorm-cloud.git"
+  },
+  "keywords": [
+    "nodejs",
+    "discordjs"
+  ],
+  "author": "legendnightt & migtarx",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xnormnet/xnorm-cloud/issues"
+  },
+  "homepage": "https://github.com/xnormnet/xnorm-cloud#readme",
+  "dependencies": {
+    "@discordjs/builders": "^0.9.0",
+    "@discordjs/rest": "^0.1.0-canary.0",
+    "discord-api-types": "^0.25.2",
+    "discord.js": "^13.3.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.3.0",
+    "nodemon": "^2.0.15"
+  }
+}
