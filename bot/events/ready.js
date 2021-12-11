@@ -25,8 +25,9 @@ module.exports = {
                         },
                     );
                     console.log(`\x1b[32m%s\x1b[0m`, '[slashCommands] registered locally successfully');
-                    // discord server mode
-                } else {
+                } 
+                // discord server mode
+                else {
                     await rest.put(
                         Routes.applicationGuildCommands(client.user.id, config.guildid),
                         {
