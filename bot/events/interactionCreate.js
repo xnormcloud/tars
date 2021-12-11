@@ -1,25 +1,47 @@
+const { MessageEmbed } = require('discord.js');
 const config = require('../config/config.json');
 
 module.exports = {
     name: "interactionCreate",
-    once: "true",
+    once: false,
     async run(interaction) {
-        
-        if (!interaction.isCommand()) return; // avoid not interactions stuff
-        const command = interaction.client.commands.get(interaction.commandName);
-        if (!command) return; // avoid not existing commands
 
-        // executes the specific command
-        try {
-            await command.execute(interaction);
-            console.log(`\x1b[35m%s\x1b[0m`, `[interactions] ${interaction.user.username} used ${interaction.commandName} command!`);
-        } catch (error) {
-            console.log(error);
+        // interaction commands
+        if (interaction.isCommand()) {
 
-            await interaction.reply({
-                content: config.interactions.error,
-                ephemeral: true,
-            });
+            const command = interaction.client.commands.get(interaction.commandName);
+            // exits if no existing commands
+            if (!command) return console.log(`\x1b[31m%s\x1b[0m`, `[ERROR] No existing commands :(`);
+
+            // tries to execute the specific command
+            try {
+
+                // executes the command
+                await command.execute(interaction);
+
+                const logchannel = interaction.member.guild.channels.cache.get(config.channels.log);
+                const avatar = interaction.member.user.displayAvatarURL({ size: 4096, dynamic: true });
+
+                // log channel stuff
+                const embed = new MessageEmbed()
+                    .setColor('#3390FF')
+                    .setThumbnail(avatar)
+                    .setAuthor('Command Used', avatar)
+                    .setDescription(`<@${interaction.user.id}>\n${interaction.user.tag}`)
+                    .addField('Command:', interaction.commandName)
+                    .setFooter(`ID: ${interaction.user.id}`)
+                    .setTimestamp()
+                logchannel.send({ embeds: [embed] });
+                
+            } catch (error) {
+                console.log(error);
+
+                await interaction.reply({
+                    content: config.interactions.error,
+                    ephemeral: true,
+                });
+            };
+
         };
 
     },
