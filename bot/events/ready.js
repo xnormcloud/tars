@@ -1,12 +1,12 @@
 const { REST } = require('@discordjs/rest');
-const { Routes } =  require('discord-api-types/v9');
+const { Routes } = require('discord-api-types/v9');
 const { MessageEmbed } = require('discord.js');
 const config = require('../config/config.json');
 
 module.exports = {
     name: "ready",
     once: "true",
-    run (client, commands) {
+    run(client, commands) {
 
         // rest stuff
         const rest = new REST({
@@ -14,10 +14,10 @@ module.exports = {
         }).setToken(config.token);
 
         // register slash commands
-        (async() =>{
+        (async () => {
             try {
                 // dev mode
-                if(config.dev === "yes") {
+                if (config.dev === "yes") {
                     await rest.put(
                         Routes.applicationCommands(client.user.id),
                         {
@@ -25,7 +25,7 @@ module.exports = {
                         }
                     );
                     console.log(`\x1b[32m%s\x1b[0m`, '[slashCommands] registered locally successfully');
-                // discord server mode
+                    // discord server mode
                 } else {
                     await rest.put(
                         Routes.applicationGuildCommands(client.user.id, config.guildid),
@@ -35,13 +35,13 @@ module.exports = {
                     );
                     console.log(`\x1b[32m%s\x1b[0m`, '[slashCommands] registered globally successfully');
                 };
-            } catch(error) {
+            } catch (error) {
                 console.error(error);
             };
         })();
 
         // log channel stuff
-        const avatar = client.user.displayAvatarURL({size:4096, dynamic: true});
+        const avatar = client.user.displayAvatarURL({ size: 4096, dynamic: true });
         const logchannel = client.channels.cache.find(channel => channel.id === config.channels.log);
         const embed = new MessageEmbed()
             .setColor('#1AA4E9')
