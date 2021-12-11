@@ -65,11 +65,16 @@ class ExtendedClient extends Client {
 		// events loader
 		events.forEach(event => {
 			if (!event.name) return; // avoid empty event files
-			if (event.once)
+			// client.once
+			if (event.once) {
 				this.once(event.name, (...args) => event.run(...args, commands));
-			else
-				this.on(event.name, (...args) => event.run(...args, commands));
-			console.log(`\x1b[34m%s\x1b[0m`, `[events] ${event.name} loaded!`);
+				console.log(`\x1b[34m%s\x1b[0m`, `[events] client.once(${event.name}) loaded!`);
+			}
+			// client.on
+			else {
+				this.on(event.name, (...args) => event.run(...args));
+				console.log(`\x1b[34m%s\x1b[0m`, `[events] client.on(${event.name}) loaded!`);
+			};
 		});
 
 		// events debug
