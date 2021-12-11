@@ -6,6 +6,9 @@ module.exports = {
     once: false,
     run(oldMember, newMember) {
 
+        // exits if log is disabled
+        if (!config.log) return;
+
         const logchannel = newMember.guild.channels.cache.get(config.channels.log);
         const avatar = newMember.user.displayAvatarURL({ size: 4096, dynamic: true });
 

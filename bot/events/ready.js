@@ -46,6 +46,7 @@ module.exports = {
 
             const avatar = client.user.displayAvatarURL({ size: 4096, dynamic: true });
             const logchannel = client.channels.cache.find(channel => channel.id === config.channels.log);
+            
             const embed = new MessageEmbed()
                 .setColor('#1AA4E9')
                 //.setThumbnail(avatar)

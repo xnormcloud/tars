@@ -19,20 +19,24 @@ module.exports = {
                 // executes the command
                 await command.execute(interaction);
 
-                const logchannel = interaction.member.guild.channels.cache.get(config.channels.log);
-                const avatar = interaction.member.user.displayAvatarURL({ size: 4096, dynamic: true });
-
                 // log channel stuff
-                const embed = new MessageEmbed()
-                    .setColor('#3390FF')
-                    .setThumbnail(avatar)
-                    .setAuthor('Command Used', avatar)
-                    .setDescription(`<@${interaction.user.id}>\n${interaction.user.tag}`)
-                    .addField('Command:', interaction.commandName)
-                    .setFooter(`ID: ${interaction.user.id}`)
-                    .setTimestamp()
-                logchannel.send({ embeds: [embed] });
-                
+                if (config.log) {
+
+                    const logchannel = interaction.member.guild.channels.cache.get(config.channels.log);
+                    const avatar = interaction.member.user.displayAvatarURL({ size: 4096, dynamic: true });
+
+                    const embed = new MessageEmbed()
+                        .setColor('#3390FF')
+                        .setThumbnail(avatar)
+                        .setAuthor('Command Used', avatar)
+                        .setDescription(`<@${interaction.user.id}>\n${interaction.user.tag}`)
+                        .addField('Command', interaction.commandName)
+                        .setFooter(`ID: ${interaction.user.id}`)
+                        .setTimestamp()
+                    logchannel.send({ embeds: [embed] });
+                    
+                };
+
             } catch (error) {
                 console.log(error);
 
