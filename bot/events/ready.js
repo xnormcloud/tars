@@ -5,7 +5,7 @@ const config = require('../config/config.json');
 
 module.exports = {
     name: "ready",
-    once: "true",
+    once: true,
     run(client, commands) {
 
         // rest stuff
@@ -17,7 +17,7 @@ module.exports = {
         (async () => {
             try {
                 // dev mode
-                if (config.dev === "yes") {
+                if (config.dev) {
                     await rest.put(
                         Routes.applicationCommands(client.user.id),
                         {
@@ -41,16 +41,21 @@ module.exports = {
         })();
 
         // log channel stuff
-        const avatar = client.user.displayAvatarURL({ size: 4096, dynamic: true });
-        const logchannel = client.channels.cache.find(channel => channel.id === config.channels.log);
-        const embed = new MessageEmbed()
-            .setColor('#1AA4E9')
-            //.setThumbnail(avatar)
-            .setAuthor(`☑️ ${client.user.username} ON!`, avatar)
-            .setDescription(config.phrases[Math.floor(Math.random() * (config.phrases.length + 1))])
-            .setFooter(`ID: ${client.user.id}`)
-            .setTimestamp()
-        logchannel.send({ embeds: [embed] });
+        if (config.log) {
+
+            const avatar = client.user.displayAvatarURL({ size: 4096, dynamic: true });
+            const logchannel = client.channels.cache.find(channel => channel.id === config.channels.log);
+            const embed = new MessageEmbed()
+                .setColor('#1AA4E9')
+                //.setThumbnail(avatar)
+                .setAuthor(`☑️ ${client.user.username} ON!`, avatar)
+                .setDescription(config.phrases[Math.floor(Math.random() * (config.phrases.length + 1))])
+                .setFooter(`ID: ${client.user.id}`)
+                .setTimestamp()
+            logchannel.send({ embeds: [embed] });
+
+        };
+
         console.log(`\x1b[36m%s\x1b[0m`, `${client.user.username} ready!`);
 
     },
