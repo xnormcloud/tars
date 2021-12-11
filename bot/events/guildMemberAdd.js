@@ -4,7 +4,7 @@ const config = require('../config/config.json');
 module.exports = {
     name: "guildMemberAdd",
     once: false,
-    async run(member) {
+    run(member) {
 
         const joinchannel = member.guild.channels.cache.get(config.channels.join);
 
@@ -16,12 +16,11 @@ module.exports = {
 
             // gets account creation date
             const date = new Date(member.user.createdTimestamp);
-            var str = date.toString(); // converts to string
+            const str = date.toString(); // converts to string
 
             const avatar = member.user.displayAvatarURL({ size: 4096, dynamic: true });
             const logchannel = member.guild.channels.cache.get(config.channels.log);
 
-            // log channel stuff
             const embed = new MessageEmbed()
                 .setColor('#1CD57F')
                 .setThumbnail(avatar)
@@ -31,7 +30,7 @@ module.exports = {
                 .setFooter(`ID: ${member.id}`)
                 .setTimestamp()
             logchannel.send({ embeds: [embed] });
-            
+
         };
 
     },

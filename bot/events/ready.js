@@ -25,7 +25,7 @@ module.exports = {
                         },
                     );
                     console.log(`\x1b[32m%s\x1b[0m`, '[slashCommands] registered locally successfully');
-                } 
+                }
                 // discord server mode
                 else {
                     await rest.put(
@@ -46,7 +46,7 @@ module.exports = {
 
             const avatar = client.user.displayAvatarURL({ size: 4096, dynamic: true });
             const logchannel = client.channels.cache.find(channel => channel.id === config.channels.log);
-            
+
             const embed = new MessageEmbed()
                 .setColor('#1AA4E9')
                 //.setThumbnail(avatar)

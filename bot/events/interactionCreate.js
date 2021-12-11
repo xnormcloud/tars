@@ -21,9 +21,9 @@ module.exports = {
 
                 // log channel stuff
                 if (config.log) {
-
-                    const logchannel = interaction.member.guild.channels.cache.get(config.channels.log);
+                    
                     const avatar = interaction.member.user.displayAvatarURL({ size: 4096, dynamic: true });
+                    const logchannel = interaction.member.guild.channels.cache.get(config.channels.log);
 
                     const embed = new MessageEmbed()
                         .setColor('#3390FF')
@@ -34,7 +34,7 @@ module.exports = {
                         .setFooter(`ID: ${interaction.user.id}`)
                         .setTimestamp()
                     logchannel.send({ embeds: [embed] });
-                    
+
                 };
 
             } catch (error) {
