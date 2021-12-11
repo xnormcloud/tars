@@ -1,0 +1,28 @@
+{
+    "token": "BOT TOKEN",
+    "guildid": "GUILD ID",
+    "dev": false,
+    "log": true,
+    "interaction": {
+        "error": "MESSAGE ERROR WHEN EXECUTING COMMANDS"
+    },
+    "roles": {
+        "staff": "STAFF ROLE ID",
+        "user": "USER ROLE ID"
+    },
+    "channels": {
+        "join": "JOIN CHANNEL ID",
+        "log": "GENERAL LOG CHANNEL ID",
+        "error": "ERROR LOG CHANNEL ID"
+    },
+    "url": {
+        "net": ".NET WEBSITE",
+        "cloud": ".CLOUD WEBSITE",
+        "twitch": "TWITCH CHANNEL"
+    },
+    "phrases": [
+        "RANDOM PHRASES",
+        "WHEN BOT",
+        "LAUNCHES"
+    ]
+}
