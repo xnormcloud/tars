@@ -22,7 +22,7 @@ module.exports = {
                         Routes.applicationCommands(client.user.id),
                         {
                             body: commands,
-                        }
+                        },
                     );
                     console.log(`\x1b[32m%s\x1b[0m`, '[slashCommands] registered locally successfully');
                     // discord server mode
@@ -31,7 +31,7 @@ module.exports = {
                         Routes.applicationGuildCommands(client.user.id, config.guildid),
                         {
                             body: commands,
-                        }
+                        },
                     );
                     console.log(`\x1b[32m%s\x1b[0m`, '[slashCommands] registered globally successfully');
                 };

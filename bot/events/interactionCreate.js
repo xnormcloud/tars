@@ -4,6 +4,7 @@ module.exports = {
     name: "interactionCreate",
     once: "true",
     async run(interaction) {
+        
         if (!interaction.isCommand()) return; // avoid not interactions stuff
         const command = interaction.client.commands.get(interaction.commandName);
         if (!command) return; // avoid not existing commands
