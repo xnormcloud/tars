@@ -2,7 +2,7 @@ const { MessageEmbed } = require('discord.js');
 const config = require('../config/config.json');
 
 module.exports = {
-    name: "guildMemberAdd",
+    name: "guildMemberRemove",
     once: false,
     run(member) {
 
