@@ -19,18 +19,31 @@ module.exports = {
             if (newMember._roles.length > oldMember._roles.length) {
 
                 // log channel stuffF
-                const embed = new MessageEmbed()
-                    .setColor('#1CD57F')
-                    .setThumbnail(avatar)
-                    .setAuthor('Role Added', avatar)
-                    .setDescription(`<@${newMember.id}>\n${newMember.user.tag}`)
-                    .setFooter(`ID: ${newMember.id}`)
-                    .setTimestamp()
+                const embed = {
+                    color: '#1CD57F',
+                    author: {
+                        name: 'Role Added',
+                        icon_url: avatar,
+                    },
+                    description: `<@${newMember.id}>\n${newMember.user.tag}`,
+                    thumbnail: {
+                        url: avatar,
+                    },
+                    timestamp: new Date(),
+                    footer: {
+                        text: `ID: ${newMember.id}`,
+                    },
+                };
 
                 for (var cont = 0; cont < newMember._roles.length; cont++) {
                     // searches the role checking inside oldMembers, newMember roles, finding the one it's only in newMember
                     if (!oldMember._roles.some(role => newMember._roles[cont].includes(role)))
-                        embed.addField('Role', `<@&${newMember._roles[cont]}>`)
+                        embed.fields = [
+                            {
+                                name: 'Role',
+                                value: `<@&${newMember._roles[cont]}>`,
+                            },
+                        ];
                 };
 
                 logchannel.send({ embeds: [embed] });
@@ -40,18 +53,31 @@ module.exports = {
             else if (newMember._roles.length < oldMember._roles.length) {
 
                 // log channel stuff
-                const embed = new MessageEmbed()
-                    .setColor('#FF0000')
-                    .setThumbnail(avatar)
-                    .setAuthor('Role Removed', avatar)
-                    .setDescription(`<@${newMember.id}>\n${newMember.user.tag}`)
-                    .setFooter(`ID: ${newMember.id}`)
-                    .setTimestamp()
+                const embed = {
+                    color: '#FF0000',
+                    author: {
+                        name: 'Role Removed',
+                        icon_url: avatar,
+                    },
+                    description: `<@${newMember.id}>\n${newMember.user.tag}`,
+                    thumbnail: {
+                        url: avatar,
+                    },
+                    timestamp: new Date(),
+                    footer: {
+                        text: `ID: ${newMember.id}`,
+                    },
+                };
 
                 for (var cont = 0; cont < oldMember._roles.length; cont++) {
                     // searches the role checking inside newMember, oldMember roles, finding the one it's only in oldMember
                     if (!newMember._roles.some(role => oldMember._roles[cont].includes(role)))
-                        embed.addField('Role', `<@&${oldMember._roles[cont]}>`)
+                        embed.fields = [
+                            {
+                                name: 'Role',
+                                value: `<@&${oldMember._roles[cont]}>`,
+                            },
+                        ];
                 };
 
                 logchannel.send({ embeds: [embed] });
@@ -63,26 +89,35 @@ module.exports = {
         else if (newMember.nickname != oldMember.nickname) {
 
             // log channel stuff
-            const embed = new MessageEmbed()
-                .setColor('#FFA500')
-                .setThumbnail(avatar)
-                .setAuthor('Nickname Changed', avatar)
-                .setDescription(`<@${newMember.id}>\n${newMember.user.tag}`)
-                .setFooter(`ID: ${newMember.id}`)
-                .setTimestamp()
+            const embed = {
+                color: '#FFA500',
+                author: {
+                    name: 'Nickname Changed',
+                    icon_url: avatar,
+                },
+                description: `<@${newMember.id}>\n${newMember.user.tag}`,
+                thumbnail: {
+                    url: avatar,
+                },
+                fields: [],
+                timestamp: new Date(),
+                footer: {
+                    text: `ID: ${newMember.id}`,
+                },
+            };
 
             // checks if it's a nickname
             if (newMember.nickname)
-                embed.addField('New Nickname', newMember.nickname);
+                embed.fields[0] = { name: 'New Nickname', value: newMember.nickname };
             // no nickname so username instead
             else
-                embed.addField('New Nickname', newMember.user.username);
+                embed.fields[0] = { name: 'New Username', value: newMember.user.username };
 
             // same here but with oldMember
             if (oldMember.nickname)
-                embed.addField('Old Nickname', oldMember.nickname);
+                embed.fields[1] = { name: 'Old Nickname', value: oldMember.nickname };
             else
-                embed.addField('Old Nickname', oldMember.user.username);
+                embed.fields[1] = { name: 'Old Username', value: oldMember.user.username };
 
             logchannel.send({ embeds: [embed] });
 

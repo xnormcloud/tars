@@ -1,6 +1,5 @@
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-const { MessageEmbed } = require('discord.js');
 const config = require('../config/config.json');
 
 module.exports = {
@@ -47,13 +46,18 @@ module.exports = {
             const avatar = client.user.displayAvatarURL({ size: 4096, dynamic: true });
             const logchannel = client.channels.cache.find(channel => channel.id === config.channels.log);
 
-            const embed = new MessageEmbed()
-                .setColor('#1AA4E9')
-                //.setThumbnail(avatar)
-                .setAuthor(`☑️ ${client.user.username} ON!`, avatar)
-                .setDescription(config.phrases[Math.floor(Math.random() * (config.phrases.length + 1))])
-                .setFooter(`ID: ${client.user.id}`)
-                .setTimestamp()
+            const embed = {
+                color: '#1AA4E9',
+                author: {
+                    name: `☑️ ${client.user.username} ON!`,
+                    icon_url: avatar,
+                },
+                description: config.phrases[Math.floor(Math.random() * (config.phrases.length + 1))],
+                timestamp: new Date(),
+                footer: {
+                    text: `ID: ${client.user.id}`,
+                },
+            };
             logchannel.send({ embeds: [embed] });
 
         };

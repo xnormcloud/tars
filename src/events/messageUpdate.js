@@ -15,16 +15,28 @@ module.exports = {
                 const avatar = newMessage.author.displayAvatarURL({ size: 4096, dynamic: true });
                 const logchannel = newMessage.guild.channels.cache.get(config.channels.log);
 
-                const embed = new MessageEmbed()
-                    .setColor('#FFA500')
-                    .setThumbnail(avatar)
-                    .setAuthor('Message Edited', avatar)
-                    .setDescription(`<@${newMessage.author.id}>\n${newMessage.author.tag}`)
-                    .addField('New Message', newMessage.content)
-                    .addField('Old Message', oldMessage.content)
-                    .addField('Channel', `<#${newMessage.channel.id}>`)
-                    .setFooter(`ID: ${newMessage.author.id}`)
-                    .setTimestamp()
+                const embed = {
+                    color: '#FFA500',
+                    author: {
+                        name: 'Message Edited',
+                        icon_url: avatar,
+                    },
+                    description: `<@${newMessage.author.id}>\n${newMessage.author.tag}`,
+                    fields: [
+                        {
+                            name: 'New Message',
+                            value: newMessage.content,
+                        },
+                        {
+                            name: 'Old Message',
+                            value: oldMessage.content,
+                        },
+                    ],
+                    timestamp: new Date(),
+                    footer: {
+                        text: `ID: ${newMessage.author.id}`,
+                    },
+                };
                 logchannel.send({ embeds: [embed] });
 
             };

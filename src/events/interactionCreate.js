@@ -25,14 +25,24 @@ module.exports = {
                     const avatar = interaction.member.user.displayAvatarURL({ size: 4096, dynamic: true });
                     const logchannel = interaction.member.guild.channels.cache.get(config.channels.log);
 
-                    const embed = new MessageEmbed()
-                        .setColor('#3390FF')
-                        .setThumbnail(avatar)
-                        .setAuthor('Command Used', avatar)
-                        .setDescription(`<@${interaction.user.id}>\n${interaction.user.tag}`)
-                        .addField('Command', interaction.commandName)
-                        .setFooter(`ID: ${interaction.user.id}`)
-                        .setTimestamp()
+                    const embed = {
+                        color: '#3390FF',
+                        author: {
+                            name: 'Command Used',
+                            icon_url: avatar,
+                        },
+                        description: `<@${interaction.user.id}>\n${interaction.user.tag}`,
+                        fields: [
+                            {
+                                name: 'Command',
+                                value: interaction.commandName,
+                            },
+                        ],
+                        timestamp: new Date(),
+                        footer: {
+                            text: `ID: ${interaction.user.id}`,
+                        },
+                    };     
                     logchannel.send({ embeds: [embed] });
 
                 };

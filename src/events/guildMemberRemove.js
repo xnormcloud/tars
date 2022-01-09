@@ -12,13 +12,21 @@ module.exports = {
             const avatar = member.user.displayAvatarURL({ size: 4096, dynamic: true });
             const logchannel = member.guild.channels.cache.get(config.channels.log);
 
-            const embed = new MessageEmbed()
-                .setColor('#FF0000')
-                .setThumbnail(avatar)
-                .setAuthor('Member Left', avatar)
-                .setDescription(`<@${member.id}>\n${member.user.tag}`)
-                .setFooter(`ID: ${member.id}`)
-                .setTimestamp()
+            const embed = {
+                color: '#FF0000',
+                author: {
+                    name: 'Member Left',
+                    icon_url: avatar,
+                },
+                description: `<@${member.id}>\n${member.user.tag}`,
+                thumbnail: {
+                    url: avatar,
+                },
+                timestamp: new Date(),
+                footer: {
+                    text: `ID: ${member.id}`,
+                },
+            };
             logchannel.send({ embeds: [embed] });
 
         };

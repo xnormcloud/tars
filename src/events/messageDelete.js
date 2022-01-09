@@ -12,15 +12,28 @@ module.exports = {
             const avatar = message.author.displayAvatarURL({ size: 4096, dynamic: true });
             const logchannel = message.guild.channels.cache.get(config.channels.log);
 
-            const embed = new MessageEmbed()
-                .setColor('#FF0000')
-                .setThumbnail(avatar)
-                .setAuthor('Message Deleted', avatar)
-                .setDescription(`<@${message.author.id}>\n${message.author.tag}`)
-                .addField('Message', message.content)
-                .addField('Channel', `<#${message.channel.id}>`)
-                .setFooter(`ID: ${message.author.id}`)
-                .setTimestamp()
+            const embed = {
+                color: '#FF0000',
+                author: {
+                    name: 'Message Deleted',
+                    icon_url: avatar,
+                },
+                description: `<@${message.author.id}>\n${message.author.tag}`,
+                fields: [
+                    {
+                        name: 'Message',
+                        value: message.content,
+                    },
+                    {
+                        name: 'Channel',
+                        value: `<#${message.channel.id}>`,
+                    },
+                ],
+                timestamp: new Date(),
+                footer: {
+                    text: `ID: ${message.author.id}`,
+                },
+            }; 
             logchannel.send({ embeds: [embed] });
 
         };

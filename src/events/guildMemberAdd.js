@@ -15,20 +15,31 @@ module.exports = {
         if (config.log) {
 
             // gets account creation date
-            const date = new Date(member.user.createdTimestamp);
-            const str = date.toString(); // converts to string
-
+            const date = new Date(member.user.createdTimestamp).toString();
             const avatar = member.user.displayAvatarURL({ size: 4096, dynamic: true });
             const logchannel = member.guild.channels.cache.get(config.channels.log);
 
-            const embed = new MessageEmbed()
-                .setColor('#1CD57F')
-                .setThumbnail(avatar)
-                .setAuthor('Member Joined', avatar)
-                .setDescription(`<@${member.id}>\n${member.user.tag}`)
-                .addField('Account Created', str.substring(0, str.length - 39))
-                .setFooter(`ID: ${member.id}`)
-                .setTimestamp()
+            const embed = {
+                color: '#1CD57F',
+                author: {
+                    name: 'Member Joined',
+                    icon_url: avatar,
+                },
+                description: `<@${member.id}>\n${member.user.tag}`,
+                thumbnail: {
+                    url: avatar,
+                },
+                fields: [
+                    {
+                        name: 'Account Creation Date',
+                        value: date.substring(0, date.length - 39),
+                    },
+                ],
+                timestamp: new Date(),
+                footer: {
+                    text: `ID: ${member.id}`,
+                },
+            };
             logchannel.send({ embeds: [embed] });
 
         };
