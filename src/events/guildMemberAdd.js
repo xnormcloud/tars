@@ -19,7 +19,7 @@ module.exports = {
             const logchannel = member.guild.channels.cache.get(config.channels.log);
 
             const embed = {
-                color: '#1CD57F',
+                color: config.colors.green,
                 author: { name: 'Member Joined', icon_url: avatar },
                 description: `<@${member.id}>\n${member.user.tag}`,
                 thumbnail: { url: avatar },

@@ -20,6 +20,12 @@
         "cloud": ".CLOUD WEBSITE",
         "twitch": "TWITCH CHANNEL"
     },
+    "colors": {
+        "blue": "#1AA4E9",
+        "green": "#1CD57F",
+        "orange": "#FFA500",
+        "red": "#FF0000"
+    },
     "presence": {
         "activites": {
             "name": "ACTIVITY NAME",

@@ -15,7 +15,7 @@ module.exports = {
                 const logchannel = newMessage.guild.channels.cache.get(config.channels.log);
 
                 const embed = {
-                    color: '#FFA500',
+                    color: config.colors.orange,
                     author: { name: 'Message Edited', icon_url: avatar },
                     description: `<@${newMessage.author.id}>\n${newMessage.author.tag}`,
                     fields: [

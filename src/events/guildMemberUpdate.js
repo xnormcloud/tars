@@ -30,7 +30,7 @@ module.exports = {
             if (newMember._roles.length > oldMember._roles.length) {
 
                 // log channel stuff
-                embed.color = { color: '#1CD57F' }
+                embed.color = { color: config.colors.green };
                 embed.author = { name: 'Role Added', icon_url: avatar };
 
                 for (var cont = 0; cont < newMember._roles.length; cont++) {
@@ -46,7 +46,7 @@ module.exports = {
             else if (newMember._roles.length < oldMember._roles.length) {
 
                 // log channel stuff
-                embed.color = { color: '#FF0000' }
+                embed.color = { color: config.colors.red };
                 embed.author = { name: 'Role Removed', icon_url: avatar };
 
                 for (var cont = 0; cont < oldMember._roles.length; cont++) {
@@ -65,7 +65,7 @@ module.exports = {
 
             // log channel stuff
             const embed = {
-                color: '#FFA500',
+                color: config.colors.orange,
                 author: { name: 'Nickname Changed', icon_url: avatar },
                 description: `<@${newMember.id}>\n${newMember.user.tag}`,
                 thumbnail: { url: avatar },

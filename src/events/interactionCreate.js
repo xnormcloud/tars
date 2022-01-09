@@ -25,7 +25,7 @@ module.exports = {
                     const logchannel = interaction.member.guild.channels.cache.get(config.channels.log);
 
                     const embed = {
-                        color: '#3390FF',
+                        color: config.colors.blue,
                         author: { name: 'Command Used', icon_url: avatar },
                         description: `<@${interaction.user.id}>\n${interaction.user.tag}`,
                         fields: [ { name: 'Command', value: interaction.commandName } ],

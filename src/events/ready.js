@@ -45,9 +45,8 @@ module.exports = {
 
             const avatar = client.user.displayAvatarURL({ size: 4096, dynamic: true });
             const logchannel = client.channels.cache.find(channel => channel.id === config.channels.log);
-
             const embed = {
-                color: '#1AA4E9',
+                color: config.colors.blue,
                 author: { name: `☑️ ${client.user.username} ON!`, icon_url: avatar },
                 description: config.phrases[Math.floor(Math.random() * (config.phrases.length + 1))],
                 timestamp: new Date(),

@@ -12,7 +12,7 @@ module.exports = {
             const logchannel = message.guild.channels.cache.get(config.channels.log);
 
             const embed = {
-                color: '#FF0000',
+                color: config.colors.red,
                 author: { name: 'Message Deleted', icon_url: avatar },
                 description: `<@${message.author.id}>\n${message.author.tag}`,
                 fields: [
