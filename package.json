@@ -1,5 +1,5 @@
 {
-  "name": "xnorm-cloud",
+  "name": "xnorm-cloud-bot",
   "version": "0.0.1",
   "description": "Discordbot for https://xnorm.cloud behaviour",
   "main": "./src/app.js",
