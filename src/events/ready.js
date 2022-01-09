@@ -48,15 +48,10 @@ module.exports = {
 
             const embed = {
                 color: '#1AA4E9',
-                author: {
-                    name: `☑️ ${client.user.username} ON!`,
-                    icon_url: avatar,
-                },
+                author: { name: `☑️ ${client.user.username} ON!`, icon_url: avatar },
                 description: config.phrases[Math.floor(Math.random() * (config.phrases.length + 1))],
                 timestamp: new Date(),
-                footer: {
-                    text: `ID: ${client.user.id}`,
-                },
+                footer: { text: `ID: ${client.user.id}` },
             };
             logchannel.send({ embeds: [embed] });
 

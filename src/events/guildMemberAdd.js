@@ -21,24 +21,12 @@ module.exports = {
 
             const embed = {
                 color: '#1CD57F',
-                author: {
-                    name: 'Member Joined',
-                    icon_url: avatar,
-                },
+                author: { name: 'Member Joined', icon_url: avatar },
                 description: `<@${member.id}>\n${member.user.tag}`,
-                thumbnail: {
-                    url: avatar,
-                },
-                fields: [
-                    {
-                        name: 'Account Creation Date',
-                        value: date.substring(0, date.length - 39),
-                    },
-                ],
+                thumbnail: { url: avatar },
+                fields: [ { name: 'Account Creation Date', value: date.substring(0, date.length - 39) } ],
                 timestamp: new Date(),
-                footer: {
-                    text: `ID: ${member.id}`,
-                },
+                footer: { text: `ID: ${member.id}` },
             };
             logchannel.send({ embeds: [embed] });
 

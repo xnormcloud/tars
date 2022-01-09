@@ -14,26 +14,15 @@ module.exports = {
 
             const embed = {
                 color: '#FF0000',
-                author: {
-                    name: 'Message Deleted',
-                    icon_url: avatar,
-                },
+                author: { name: 'Message Deleted', icon_url: avatar },
                 description: `<@${message.author.id}>\n${message.author.tag}`,
                 fields: [
-                    {
-                        name: 'Message',
-                        value: message.content,
-                    },
-                    {
-                        name: 'Channel',
-                        value: `<#${message.channel.id}>`,
-                    },
+                    { name: 'Message', value: message.content },
+                    { name: 'Channel', value: `<#${message.channel.id}>` },
                 ],
                 timestamp: new Date(),
-                footer: {
-                    text: `ID: ${message.author.id}`,
-                },
-            }; 
+                footer: { text: `ID: ${message.author.id}` },
+            };
             logchannel.send({ embeds: [embed] });
 
         };

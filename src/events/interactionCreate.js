@@ -27,22 +27,12 @@ module.exports = {
 
                     const embed = {
                         color: '#3390FF',
-                        author: {
-                            name: 'Command Used',
-                            icon_url: avatar,
-                        },
+                        author: { name: 'Command Used', icon_url: avatar },
                         description: `<@${interaction.user.id}>\n${interaction.user.tag}`,
-                        fields: [
-                            {
-                                name: 'Command',
-                                value: interaction.commandName,
-                            },
-                        ],
+                        fields: [ { name: 'Command', value: interaction.commandName } ],
                         timestamp: new Date(),
-                        footer: {
-                            text: `ID: ${interaction.user.id}`,
-                        },
-                    };     
+                        footer: { text: `ID: ${interaction.user.id}` },
+                    };
                     logchannel.send({ embeds: [embed] });
 
                 };

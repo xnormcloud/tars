@@ -15,35 +15,29 @@ module.exports = {
         // role changed
         if (oldMember._roles.length != newMember._roles.length) {
 
+            // shared embed
+            const embed = {
+                description: `<@${newMember.id}>\n${newMember.user.tag}`,
+                thumbnail: {
+                    url: avatar,
+                },
+                timestamp: new Date(),
+                footer: {
+                    text: `ID: ${newMember.id}`,
+                },
+            };
+
             // role added
             if (newMember._roles.length > oldMember._roles.length) {
 
-                // log channel stuffF
-                const embed = {
-                    color: '#1CD57F',
-                    author: {
-                        name: 'Role Added',
-                        icon_url: avatar,
-                    },
-                    description: `<@${newMember.id}>\n${newMember.user.tag}`,
-                    thumbnail: {
-                        url: avatar,
-                    },
-                    timestamp: new Date(),
-                    footer: {
-                        text: `ID: ${newMember.id}`,
-                    },
-                };
+                // log channel stuff
+                embed.color = { color: '#1CD57F' }
+                embed.author = { name: 'Role Added', icon_url: avatar };
 
                 for (var cont = 0; cont < newMember._roles.length; cont++) {
                     // searches the role checking inside oldMembers, newMember roles, finding the one it's only in newMember
                     if (!oldMember._roles.some(role => newMember._roles[cont].includes(role)))
-                        embed.fields = [
-                            {
-                                name: 'Role',
-                                value: `<@&${newMember._roles[cont]}>`,
-                            },
-                        ];
+                        embed.fields = [ { name: 'Role', value: `<@&${newMember._roles[cont]}>` } ];
                 };
 
                 logchannel.send({ embeds: [embed] });
@@ -53,31 +47,13 @@ module.exports = {
             else if (newMember._roles.length < oldMember._roles.length) {
 
                 // log channel stuff
-                const embed = {
-                    color: '#FF0000',
-                    author: {
-                        name: 'Role Removed',
-                        icon_url: avatar,
-                    },
-                    description: `<@${newMember.id}>\n${newMember.user.tag}`,
-                    thumbnail: {
-                        url: avatar,
-                    },
-                    timestamp: new Date(),
-                    footer: {
-                        text: `ID: ${newMember.id}`,
-                    },
-                };
+                embed.color = { color: '#FF0000' }
+                embed.author = { name: 'Role Removed', icon_url: avatar };
 
                 for (var cont = 0; cont < oldMember._roles.length; cont++) {
                     // searches the role checking inside newMember, oldMember roles, finding the one it's only in oldMember
                     if (!newMember._roles.some(role => oldMember._roles[cont].includes(role)))
-                        embed.fields = [
-                            {
-                                name: 'Role',
-                                value: `<@&${oldMember._roles[cont]}>`,
-                            },
-                        ];
+                        embed.fields = [ { name: 'Role', value: `<@&${oldMember._roles[cont]}>` } ];
                 };
 
                 logchannel.send({ embeds: [embed] });
@@ -91,19 +67,12 @@ module.exports = {
             // log channel stuff
             const embed = {
                 color: '#FFA500',
-                author: {
-                    name: 'Nickname Changed',
-                    icon_url: avatar,
-                },
+                author: { name: 'Nickname Changed', icon_url: avatar },
                 description: `<@${newMember.id}>\n${newMember.user.tag}`,
-                thumbnail: {
-                    url: avatar,
-                },
+                thumbnail: { url: avatar },
                 fields: [],
                 timestamp: new Date(),
-                footer: {
-                    text: `ID: ${newMember.id}`,
-                },
+                footer: { text: `ID: ${newMember.id}` },
             };
 
             // checks if it's a nickname

@@ -17,25 +17,14 @@ module.exports = {
 
                 const embed = {
                     color: '#FFA500',
-                    author: {
-                        name: 'Message Edited',
-                        icon_url: avatar,
-                    },
+                    author: { name: 'Message Edited', icon_url: avatar },
                     description: `<@${newMessage.author.id}>\n${newMessage.author.tag}`,
                     fields: [
-                        {
-                            name: 'New Message',
-                            value: newMessage.content,
-                        },
-                        {
-                            name: 'Old Message',
-                            value: oldMessage.content,
-                        },
+                        { name: 'New Message', value: newMessage.content },
+                        { name: 'Old Message', value: oldMessage.content },
                     ],
                     timestamp: new Date(),
-                    footer: {
-                        text: `ID: ${newMessage.author.id}`,
-                    },
+                    footer: { text: `ID: ${newMessage.author.id}` },
                 };
                 logchannel.send({ embeds: [embed] });
 

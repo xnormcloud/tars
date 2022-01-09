@@ -14,18 +14,11 @@ module.exports = {
 
             const embed = {
                 color: '#FF0000',
-                author: {
-                    name: 'Member Left',
-                    icon_url: avatar,
-                },
+                author: { name: 'Member Left', icon_url: avatar },
                 description: `<@${member.id}>\n${member.user.tag}`,
-                thumbnail: {
-                    url: avatar,
-                },
+                thumbnail: { url: avatar },
                 timestamp: new Date(),
-                footer: {
-                    text: `ID: ${member.id}`,
-                },
+                footer: { text: `ID: ${member.id}` },
             };
             logchannel.send({ embeds: [embed] });
 
