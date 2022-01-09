@@ -17,11 +17,11 @@ class ExtendedClient extends Client {
 			// presence stuff
 			presence: {
 				activities: [{
-					name: ':)',
-					type: 'LISTENING', // PLAYING, STREAMING, LISTENING, WATCHING
-					//url: config.url.twitch
+					name: config.presence.activites.name,
+					type: config.presence.activites.type[3], // [0]PLAYING, [1]STREAMING, [2]LISTENING, [3]WATCHING
+					url: config.url.twitch
 				}],
-				status: 'dnd', // online, idle, dnd, offline
+				status: config.presence.status[2], // [0]online, [1]idle, [2]dnd, [3]offline
 			},
 		});
 		// creates commands collection
@@ -39,13 +39,13 @@ class ExtendedClient extends Client {
 	async registerModules() {
 
 		// commands register
-		const commandFiles = fs.readdirSync(`${___dirname}/bot/commands`)
+		const commandFiles = fs.readdirSync(`${___dirname}/src/commands`)
 			.filter(file => file.endsWith(".js"));
 		const commands = [];
 
 		// commands loader
 		for (const file of commandFiles) {
-			const command = require(`${___dirname}/bot/commands/${file}`);
+			const command = require(`../commands/${file}`);
 			commands.push(command.data.toJSON());
 			if (!command.data.name) return; // avoid empty command files
 			this.commands.set(command.data.name, command);
@@ -58,9 +58,9 @@ class ExtendedClient extends Client {
 		console.log('loadedcommands:', this.commands);
 
 		// events register
-		const eventFiles = fs.readdirSync(`${___dirname}/bot/events`)
+		const eventFiles = fs.readdirSync(`${___dirname}/src/events`)
 			.filter(file => file.endsWith(".js"));
-		const events = eventFiles.map(file => require(`${___dirname}/bot/events/${file}`));
+		const events = eventFiles.map(file => require(`../events/${file}`));
 
 		// events loader
 		events.forEach(event => {

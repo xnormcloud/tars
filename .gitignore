@@ -1,6 +1,11 @@
 # node
 node_modules
-package-lock.json
 
 # config
-bot/config/config.json
+**/config.json
+
+# data
+**/clients.json
+
+# lintter config
+.eslintrc.json

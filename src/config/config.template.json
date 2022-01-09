@@ -20,6 +20,23 @@
         "cloud": ".CLOUD WEBSITE",
         "twitch": "TWITCH CHANNEL"
     },
+    "presence": {
+        "activites": {
+            "name": "ACTIVITY NAME",
+            "type": [
+                "PLAYING",
+                "STREAMING",
+                "LISTENING",
+                "WATCHING"
+            ]
+        },
+        "status": [
+            "online",
+            "idle",
+            "dnd",
+            "offline"
+        ]
+    },
     "phrases": [
         "RANDOM PHRASES",
         "WHEN BOT",
