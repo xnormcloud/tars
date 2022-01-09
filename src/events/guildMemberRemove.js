@@ -1,4 +1,3 @@
-const { MessageEmbed } = require('discord.js');
 const config = require('../config/config.json');
 
 module.exports = {
