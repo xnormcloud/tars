@@ -8,13 +8,11 @@ const ___dirname = path.resolve();
 class ExtendedClient extends Client {
 
 	constructor() {
-
 		super({
-
 			// https://ziad87.net/intents
 			intents: 32767,
 			disableEveryone: true,
-			// presence stuff
+			// presence
 			presence: {
 				activities: [{
 					name: config.presence.activites.name,
@@ -26,61 +24,51 @@ class ExtendedClient extends Client {
 		});
 		// creates commands collection
 		this.commands = new Collection();
-
 	};
 
 	run() {
-
 		this.registerModules();
 		this.login(config.token);
-
 	};
 
 	async registerModules() {
-
 		// commands register
 		const commandFiles = fs.readdirSync(`${___dirname}/src/commands`)
-			.filter(file => file.endsWith(".js"));
-		const commands = [];
-
+			.filter(file => file.endsWith('.js'));
 		// commands loader
 		for (const file of commandFiles) {
 			const command = require(`../commands/${file}`);
-			commands.push(command.data.toJSON());
-			if (!command.data.name) return; // avoid empty command files
-			this.commands.set(command.data.name, command);
-			console.log(`\x1b[32m%s\x1b[0m`, `[commands] ${command.data.name} loaded!`);
+			if (!command.name) return; // avoid empty command files
+			this.commands.set(command.name, command);
+			console.log(`\x1b[32m%s\x1b[0m`, `[commands] ${command.name} loaded!`);
 		};
-
 		// commands debug
 		console.log('commandFiles:', commandFiles);
-		console.log('commands:', commands);
 		console.log('loadedcommands:', this.commands);
-
 		// events register
 		const eventFiles = fs.readdirSync(`${___dirname}/src/events`)
 			.filter(file => file.endsWith(".js"));
 		const events = eventFiles.map(file => require(`../events/${file}`));
-
 		// events loader
 		events.forEach(event => {
 			if (!event.name) return; // avoid empty event files
 			// client.once
 			if (event.once) {
-				this.once(event.name, (...args) => event.run(...args, commands));
+				this.once(event.name, (...args) => event.run(...args));
 				console.log(`\x1b[34m%s\x1b[0m`, `[events] client.once(${event.name}) loaded!`);
 			}
 			// client.on
 			else {
-				this.on(event.name, (...args) => event.run(...args));
+				if (event.name === 'messageCreate')
+					this.on(event.name, (...args) => event.run(this.commands, ...args));
+				else
+					this.on(event.name, (...args) => event.run(...args));
 				console.log(`\x1b[34m%s\x1b[0m`, `[events] client.on(${event.name}) loaded!`);
 			};
 		});
-
 		// events debug
 		console.log('eventFiles:', eventFiles);
 		console.log('events:', events);
-
 	};
 
 };

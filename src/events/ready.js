@@ -1,17 +1,16 @@
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
+// const { REST } = require('@discordjs/rest');
+// const { Routes } = require('discord-api-types/v9');
 const config = require('../config/config.json');
 
 module.exports = {
-    name: "ready",
+    name: 'ready',
     once: true,
-    run(client, commands) {
-
+    run(client) {
+        /* slash commands register
         // rest stuff
         const rest = new REST({
             version: "9",
         }).setToken(config.token);
-
         // register slash commands
         (async () => {
             try {
@@ -39,24 +38,17 @@ module.exports = {
                 console.error(error);
             };
         })();
-
-        // log channel stuff
-        if (config.log) {
-
-            const avatar = client.user.displayAvatarURL({ size: 4096, dynamic: true });
-            const logchannel = client.channels.cache.find(channel => channel.id === config.channels.log);
-            const embed = {
-                color: config.colors.blue,
-                author: { name: `☑️ ${client.user.username} ON!`, icon_url: avatar },
-                description: config.phrases[Math.floor(Math.random() * (config.phrases.length + 1))],
-                timestamp: new Date(),
-                footer: { text: `ID: ${client.user.id}` },
-            };
-            logchannel.send({ embeds: [embed] });
-
-        };
-
+        */
+        // log
         console.log(`\x1b[36m%s\x1b[0m`, `${client.user.username} ready!`);
-
-    },
+        const logchannel = client.channels.cache.find(channel => channel.id === config.channels.log);
+        const embed = {
+            color: config.colors.blue,
+            author: { name: `☑️ ${client.user.username} ON!`, icon_url: client.user.displayAvatarURL({ size: 4096, dynamic: true }) },
+            description: '[xnorm-cloud](https://xnorm.cloud)',
+            timestamp: new Date(),
+            footer: { text: `ID: ${client.user.id}` }
+        };
+        logchannel.send({ embeds: [embed] });
+    }
 };

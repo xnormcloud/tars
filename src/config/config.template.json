@@ -1,11 +1,7 @@
 {
     "token": "BOT TOKEN",
+    "prefix": "COMMANDS PREFIX",
     "guildid": "GUILD ID",
-    "dev": false,
-    "log": true,
-    "interaction": {
-        "error": "MESSAGE ERROR WHEN EXECUTING COMMANDS"
-    },
     "roles": {
         "staff": "STAFF ROLE ID",
         "user": "USER ROLE ID"
@@ -42,10 +38,5 @@
             "dnd",
             "offline"
         ]
-    },
-    "phrases": [
-        "RANDOM PHRASES",
-        "WHEN BOT",
-        "LAUNCHES"
-    ]
+    }
 }
