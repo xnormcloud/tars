@@ -11,7 +11,7 @@ module.exports = {
             timestamp: new Date(),
             footer: { text: `ID: ${message.member.id}` }
         }
-        // Type of help is going to display
+        // help type is going to display
         if (message.member.permissions.has(['ADMINISTRATOR'] || [])) {
             embed.author = { name: 'Administrator Commands Help' };
         } else {
@@ -19,14 +19,33 @@ module.exports = {
         }
         // commands fields info
         var cont = 0;
-        for (let [name] of commands) {
-            if (commands.get(name).name != 'help') {
-                if (commands.get(name).permission != null) {
-                    if (message.member.permissions.has(commands.get(name).permission || [])) {
-                        embed.fields[cont] = { name: `.${commands.get(name).name}`, value: commands.get(name).description, inline: true };
+        for (let [commandname] of commands) {
+            if (commands.get(commandname).name != 'help') {
+                if (commands.get(commandname).permission != null) {
+                    if (message.member.permissions.has(commands.get(commandname).permission || [])) {
+                        if (commands.get(commandname).subcommands != null) {
+                            var subcommands = '```';
+                            // gets subcommands
+                            commands.get(commandname).subcommands.forEach(subcommand => {
+                                if (subcommand.parameters != null) {
+                                    var parameters = '';
+                                    // gets each subcommand parameter
+                                    subcommand.parameters.forEach(parameter => {
+                                        parameters += `[${parameter}] `
+                                    });
+                                    subcommands += `\n- ${subcommand.name}: ${subcommand.description}\n${parameters}`
+                                } else {
+                                    subcommands += `\n- ${subcommand.name}: ${subcommand.description}`;
+                                }
+                            });
+                            subcommands += '```';
+                            embed.fields[cont] = { name: `.${commands.get(commandname).name}`, value: `${commands.get(commandname).description}\n${subcommands}` };
+                        } else {
+                            embed.fields[cont] = { name: `.${commands.get(commandname).name}`, value: commands.get(commandname).description };
+                        }
                     }
                 } else {
-                    embed.fields[cont] = { name: `.${commands.get(name).name}`, value: commands.get(name).description, inline: true };
+                    embed.fields[cont] = { name: `.${commands.get(commandname).name}`, value: commands.get(commandname).description };
                 }
                 cont++;
             }
