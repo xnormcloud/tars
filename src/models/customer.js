@@ -1,6 +1,6 @@
 const mongo = require('mongoose');
 
-const CutomerSchema = new mongoose.Schema({
+const CutomerSchema = new mongo.Schema({
     id: { type: String, required: true},
     name: { type: String, required: true},
     invoiceday: { type: Number, required: true},
@@ -8,4 +8,5 @@ const CutomerSchema = new mongoose.Schema({
     users: {type: Array, required: true},
     services: {type: Array, required: true}
 });
-const Customer = module.exports = mongoose.model('Customer', CutomerSchema);
+
+const Customer = module.exports = mongo.model('Customer', CutomerSchema);
