@@ -3,6 +3,3 @@ node_modules
 
 # config
 **/config.json
-
-# lintter config
-.eslintrc.json
