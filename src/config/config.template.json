@@ -1,5 +1,6 @@
 {
     "token": "BOT TOKEN",
+    "mongo": "MONGODB URL",
     "prefix": "COMMANDS PREFIX",
     "guildid": "GUILD ID",
     "clientid": "BOT ID",

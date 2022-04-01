@@ -1,3 +1,4 @@
 const mongoose = require('mongoose');
+const config = require('../config/config.json');
 
-module.exports = mongoose.connect('mongodb://127.0.0.1:27017/xnormcloud', { useNewUrlParser: true, useUnifiedTopology: true });
+module.exports = mongoose.connect(config.mongo, { useNewUrlParser: true, useUnifiedTopology: true });
