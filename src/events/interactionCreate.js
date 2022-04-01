@@ -1,8 +1,10 @@
+// eslint-disable-next-line no-unused-vars
 const config = require('../config/config.json');
 
 module.exports = {
     name: 'interactionCreate',
     once: false,
+    // eslint-disable-next-line no-unused-vars
     async run(interaction) {
         /* slash commands
         // interaction commands
@@ -38,5 +40,5 @@ module.exports = {
             };
         };
         */
-    }
+    },
 };

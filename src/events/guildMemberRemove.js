@@ -13,8 +13,8 @@ module.exports = {
             description: `<@${member.id}>\n${member.user.tag}`,
             thumbnail: { url: avatar },
             timestamp: new Date(),
-            footer: { text: `ID: ${member.id}` }
+            footer: { text: `ID: ${member.id}` },
         };
         logchannel.send({ embeds: [embed] });
-    }
+    },
 };

@@ -18,8 +18,8 @@ module.exports = {
             thumbnail: { url: avatar },
             fields: [ { name: 'Account Creation Date', value: date.substring(0, date.length - 39) } ],
             timestamp: new Date(),
-            footer: { text: `ID: ${member.id}` }
+            footer: { text: `ID: ${member.id}` },
         };
         logchannel.send({ embeds: [embed] });
-    }
+    },
 };

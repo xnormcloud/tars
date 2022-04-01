@@ -9,47 +9,51 @@ module.exports = {
             thumbnail: { url: message.guild.members.cache.get(config.clientid).displayAvatarURL({ size: 4096, dynamic: true }) },
             fields: [],
             timestamp: new Date(),
-            footer: { text: `ID: ${message.member.id}` }
-        }
+            footer: { text: `ID: ${message.member.id}` },
+        };
         // help type is going to display
         if (message.member.permissions.has(['ADMINISTRATOR'] || [])) {
             embed.author = { name: 'Administrator Commands Help' };
-        } else {
+        }
+        else {
             embed.author = { name: 'Commands Help' };
         }
-        // commands fields info
-        var cont = 0;
-        for (let [commandname] of commands) {
-            if (commands.get(commandname).name != 'help') {
+        // command fields info
+        let cont = 0;
+        for (const [commandname] of commands) {
+            if (commands.get(commandname).name !== 'help') {
                 if (commands.get(commandname).permission != null) {
                     if (message.member.permissions.has(commands.get(commandname).permission || [])) {
                         if (commands.get(commandname).subcommands != null) {
-                            var subcommands = '```';
+                            let subcommands = '```';
                             // gets subcommands
                             commands.get(commandname).subcommands.forEach(subcommand => {
                                 if (subcommand.parameters != null) {
-                                    var parameters = '';
+                                    let parameters = '';
                                     // gets each subcommand parameter
                                     subcommand.parameters.forEach(parameter => {
-                                        parameters += `[${parameter}] `
+                                        parameters += `[${parameter}] `;
                                     });
-                                    subcommands += `\n- ${subcommand.name}: ${subcommand.description}\n${parameters}`
-                                } else {
+                                    subcommands += `\n- ${subcommand.name}: ${subcommand.description}\n${parameters}`;
+                                }
+                                else {
                                     subcommands += `\n- ${subcommand.name}: ${subcommand.description}`;
                                 }
                             });
                             subcommands += '```';
                             embed.fields[cont] = { name: `.${commands.get(commandname).name}`, value: `${commands.get(commandname).description}\n${subcommands}` };
-                        } else {
+                        }
+                        else {
                             embed.fields[cont] = { name: `.${commands.get(commandname).name}`, value: commands.get(commandname).description };
                         }
                     }
-                } else {
+                }
+                else {
                     embed.fields[cont] = { name: `.${commands.get(commandname).name}`, value: commands.get(commandname).description };
                 }
                 cont++;
             }
         }
         message.reply({ embeds: [embed] });
-    }
-}
+    },
+};

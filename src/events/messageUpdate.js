@@ -5,7 +5,7 @@ module.exports = {
     once: false,
     run(oldMessage, newMessage) {
         // checks if it's a content change
-        if (newMessage.content != oldMessage.content) {
+        if (newMessage.content !== oldMessage.content) {
             // log
             const avatar = newMessage.author.displayAvatarURL({ size: 4096, dynamic: true });
             const logchannel = newMessage.guild.channels.cache.get(config.channels.log);
@@ -18,9 +18,9 @@ module.exports = {
                     { name: 'Old Message', value: oldMessage.content },
                 ],
                 timestamp: new Date(),
-                footer: { text: `ID: ${newMessage.author.id}` }
+                footer: { text: `ID: ${newMessage.author.id}` },
             };
             logchannel.send({ embeds: [embed] });
-        };
-    }
+        }
+    },
 };

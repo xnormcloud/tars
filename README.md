@@ -1,2 +1,2 @@
 # xnorm-cloud-bot
-Discordbot for [xnormcloud](https://xnorm.cloud) behaviour.
+discordbot for [xnormcloud](https://xnorm.cloud) behaviour
