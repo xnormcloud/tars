@@ -1,31 +1,17 @@
 {
   "name": "xnorm-cloud-bot",
   "version": "0.0.1",
-  "description": "Discordbot for https://xnorm.cloud behaviour",
-  "main": "./src/app.js",
-  "scripts": {
-    "dev": "nodemon .",
-    "bot": "node ."
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/xnormnet/xnorm-cloud-bot.git"
-  },
-  "keywords": [
-    "discordjs"
-  ],
-  "author": "legendnightt",
+  "description": "discordbot for xnormcloud behaviour",
+  "main": "src/app.js",
+  "repository": "git@github.com:xnormnet/xnorm-cloud-bot.git",
+  "author": "legendnightt <alex@legend.sh>",
   "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/xnormnet/xnorm-cloud-bot/issues"
-  },
-  "homepage": "https://github.com/xnormnet/xnorm-cloud-bot#readme",
   "dependencies": {
-    "discord.js": "^13.5.1",
-    "mongoose": "^6.1.7"
+    "discord.js": "^13.6.0",
+    "mongoose": "^6.2.9"
   },
   "devDependencies": {
-    "eslint": "^8.3.0",
+    "eslint": "^8.12.0",
     "nodemon": "^2.0.15"
   }
 }
