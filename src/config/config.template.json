@@ -16,15 +16,27 @@
     "categories" : [
         {
             "name": "order",
-            "id": "ORDER CATEGORY ID"
+            "id": "ORDER CATEGORY ID",
+            "info": [
+                "order ticket\n",
+                "next line :)"
+            ]
         },
         {
             "name": "support",
-            "id": "SUPPORT CATEGORY ID"
+            "id": "SUPPORT CATEGORY ID",
+            "info": [
+                "support ticket\n",
+                "next line :)"
+            ]
         },
         {
             "name": "invoice",
-            "id": "INVOICE CATEGORY ID"
+            "id": "INVOICE CATEGORY ID",
+            "info": [
+                "invoice ticket\n",
+                "next line :)"
+            ]
         }
     ],
     "url": {
