@@ -13,11 +13,20 @@
         "log": "GENERAL LOG CHANNEL ID",
         "error": "ERROR LOG CHANNEL ID"
     },
-    "categories" : [{
-        "order" : "ORDER CATEGORY ID",
-        "support" : "SUPPORT CATEGORY ID",
-        "invoice" : "INVOICE CATEGORY ID"
-    }],
+    "categories" : [
+        {
+            "name": "order",
+            "id": "ORDER CATEGORY ID"
+        },
+        {
+            "name": "support",
+            "id": "SUPPORT CATEGORY ID"
+        },
+        {
+            "name": "invoice",
+            "id": "INVOICE CATEGORY ID"
+        }
+    ],
     "url": {
         "net": ".NET WEBSITE",
         "cloud": ".CLOUD WEBSITE",
