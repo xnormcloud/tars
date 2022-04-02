@@ -11,7 +11,7 @@ module.exports.create = (type, customer, message) => {
                         color: config.colors.blue,
                         author: { name: `Welcome to ${category.name} ticket` },
                         description: 'Please be patient, we will answer as soon as possible',
-                        fields: [ { name: 'Important info', value: category.info.join('') } ],
+                        fields: [ { name: 'Important info', value: category.info.join('\n') } ],
                         timestamp: new Date(),
                         footer: { text: `ID: ${channel.id}` },
                     };

@@ -18,7 +18,7 @@
             "name": "order",
             "id": "ORDER CATEGORY ID",
             "info": [
-                "order ticket\n",
+                "order ticket",
                 "next line :)"
             ]
         },
@@ -26,7 +26,7 @@
             "name": "support",
             "id": "SUPPORT CATEGORY ID",
             "info": [
-                "support ticket\n",
+                "support ticket",
                 "next line :)"
             ]
         },
@@ -34,7 +34,7 @@
             "name": "invoice",
             "id": "INVOICE CATEGORY ID",
             "info": [
-                "invoice ticket\n",
+                "invoice ticket",
                 "next line :)"
             ]
         }
