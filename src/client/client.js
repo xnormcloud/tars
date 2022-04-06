@@ -56,8 +56,12 @@ class ExtendedClient extends Client {
             }
             // client.on
             else {
-                if (event.name === 'messageCreate') {this.on(event.name, (...args) => event.run(this.commands, ...args));}
-                else {this.on(event.name, (...args) => event.run(...args));}
+                if (event.name === 'messageCreate') {
+                    this.on(event.name, (...args) => event.run(this.commands, ...args));
+                }
+                else {
+                    this.on(event.name, (...args) => event.run(...args));
+                }
                 console.log('\x1b[34m%s\x1b[0m', `[events] client.on(${event.name}) loaded`);
             }
         });
