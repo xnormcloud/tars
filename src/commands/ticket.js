@@ -10,13 +10,13 @@ module.exports = {
         { name: 'create', description: 'creates new ticket', parameters: ['type', 'customerid'] },
     ],
     run(message, args) {
-        try {
-            if (args[0] === 'create') {
-                ticket.create(args[1], args[2], message);
-            }
-        }
-        catch (e) {
-            console.log(e.stack);
+        switch (args[0]) {
+        case 'create':
+            ticket.create(args[1], args[2], message);
+            break;
+        default:
+            message.reply('Unknown subcommand provided');
+            break;
         }
     },
 };
