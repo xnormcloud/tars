@@ -15,14 +15,14 @@ class ExtendedClient extends Client {
             // presence
             presence: {
                 activities: [{
-                    name: config.presence.activites.name,
-                    type: config.presence.activites.type[3], // [0]PLAYING, [1]STREAMING, [2]LISTENING, [3]WATCHING
+                    name: config.presence.activities.name,
+                    type: config.presence.activities.type[3], // [0]PLAYING, [1]STREAMING, [2]LISTENING, [3]WATCHING
                     url: config.url.twitch,
                 }],
                 status: config.presence.status[2], // [0]online, [1]idle, [2]dnd, [3]offline
             },
         });
-        // creates commands collection
+        // create commands collection
         this.commands = new Collection();
     }
 
@@ -47,7 +47,7 @@ class ExtendedClient extends Client {
         const eventFiles = fs.readdirSync(`${dirname}/src/events`)
             .filter(file => file.endsWith('.js'));
         const events = eventFiles.map(file => require(`../events/${file}`));
-        const guild = this.guilds.cache.get(config.guildid);
+        const guild = this.guilds.cache.get(config.guild);
         const logChannel = this.channels.cache.find(channel => channel.id === config.channels.log);
         // events loader
         events.forEach(event => {

@@ -6,7 +6,7 @@ module.exports = {
     run(message, commands) {
         const embed = {
             color: config.colors.blue,
-            thumbnail: { url: message.guild.members.cache.get(config.clientid).displayAvatarURL({ size: 4096, dynamic: true }) },
+            thumbnail: { url: message.guild.members.cache.get(config.client).displayAvatarURL({ size: 4096, dynamic: true }) },
             fields: [],
             timestamp: new Date(),
             footer: { text: `ID: ${message.member.id}` },

@@ -9,7 +9,7 @@ module.exports.open = (guild, message, type, customer) => {
             try {
                 guild.channels.create(customer).then(channel => {
                     channel.setParent(category.id).then(() => {
-                        const bot = guild.members.cache.filter(member => member.id === config.clientid).values().next().value;
+                        const bot = guild.members.cache.filter(member => member.id === config.client).values().next().value;
                         const embed = {
                             color: config.colors.blue,
                             author: { name: `Welcome to ${category.name} ticket` },
@@ -77,7 +77,7 @@ module.exports.close = async (guild, message, type, customer) => {
                 });
                 const embed = {
                     color: config.colors.red,
-                    author: { name: `Transcript ${type}`, icon_url: guild.members.cache.get(config.clientid).displayAvatarURL({ size: 4096, dynamic: true }) },
+                    author: { name: `Transcript ${type}`, icon_url: guild.members.cache.get(config.client).displayAvatarURL({ size: 4096, dynamic: true }) },
                     fields: [
                         { name: 'Ticket Name', value: ticketChannel.name },
                         // TODO: setup direct transcript sys

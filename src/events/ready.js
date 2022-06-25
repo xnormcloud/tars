@@ -27,7 +27,7 @@ module.exports = {
                 // discord server mode
                 else {
                     await rest.put(
-                        Routes.applicationGuildCommands(client.user.id, config.guildid),
+                        Routes.applicationGuildCommands(client.user.id, config.guild),
                         {
                             body: commands,
                         },
