@@ -1,7 +1,7 @@
 const { MessageActionRow, MessageButton } = require('discord.js');
 const config = require('../config/config.json');
 
-module.exports.create = (guild, message, type, customer) => {
+module.exports.open = (guild, message, type, customer) => {
     const category = config.categories.filter(group => group.name === type)[0];
     if (category !== undefined) {
         if (!exists(guild, category, customer)) {
@@ -39,7 +39,7 @@ module.exports.create = (guild, message, type, customer) => {
                             );
                         channel.send({ embeds: [embed], components: [buttons] }).then(() => {
                             if (category.permission != null) {
-                                message.reply(`Channel successfully created in \`${category.name}\` category!`);
+                                message.reply(`Channel successfully opened in \`${category.name}\` category!`);
                             }
                         });
                     });
@@ -48,12 +48,38 @@ module.exports.create = (guild, message, type, customer) => {
             catch (e) {
                 console.error(e);
                 if (message != null) {
-                    message.reply('There was a problem creating the ticket');
+                    message.reply('There was a problem opening the ticket');
                 }
             }
         }
         else if (message != null) {
             message.reply(`Already existing channel in \`${category.name}\` category!`);
+        }
+    }
+    else if (message != null) {
+        message.reply(`\`${type}\` category doesn't exists!`);
+    }
+};
+
+module.exports.close = (guild, message, type, customer) => {
+    const category = config.categories.filter(group => group.name === type)[0];
+    if (category !== undefined) {
+        if (exists(guild, category, customer)) {
+            try {
+                guild.channels.cache.filter(channel => channel.name === customer && channel.parentId === category.id).first().delete();
+                if (message != null) {
+                    message.reply(`Channel successfully closed from \`${category.name}\` category!`);
+                }
+            }
+            catch (e) {
+                console.error(e);
+                if (message != null) {
+                    message.reply('There was a problem closing the ticket');
+                }
+            }
+        }
+        else if (message != null) {
+            message.reply(`No provided customer channel in \`${category.name}\` category!`);
         }
     }
     else if (message != null) {
