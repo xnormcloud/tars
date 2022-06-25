@@ -27,8 +27,9 @@ class ExtendedClient extends Client {
     }
 
     run() {
-        this.registerModules().then(() => console.log('\x1b[36m%s\x1b[0m', '[modules] everything loaded successfully'));
         this.login(config.token).then(() => console.log('\x1b[36m%s\x1b[0m', '[login] login step succeed'));
+        // TODO: fix execute ready.js from here
+        this.once('ready', () => this.registerModules());
     }
 
     async registerModules() {
@@ -46,25 +47,28 @@ class ExtendedClient extends Client {
         const eventFiles = fs.readdirSync(`${dirname}/src/events`)
             .filter(file => file.endsWith('.js'));
         const events = eventFiles.map(file => require(`../events/${file}`));
+        const guild = this.guilds.cache.get(config.guildid);
+        const logChannel = this.channels.cache.find(channel => channel.id === config.channels.log);
         // events loader
         events.forEach(event => {
             if (!event.name) return; // avoid empty event files
             // client.once
-            if (event.once) {
+            if (event.once && event.name !== 'ready') {
                 this.once(event.name, (...args) => event.run(...args));
                 console.log('\x1b[34m%s\x1b[0m', `[events] client.once(${event.name}) loaded`);
             }
             // client.on
             else {
                 if (event.name === 'messageCreate') {
-                    this.on(event.name, (...args) => event.run(this.commands, ...args));
+                    this.on(event.name, (...args) => event.run(guild, this.commands, ...args));
                 }
                 else {
-                    this.on(event.name, (...args) => event.run(...args));
+                    this.on(event.name, (...args) => event.run(logChannel, ...args));
                 }
                 console.log('\x1b[34m%s\x1b[0m', `[events] client.on(${event.name}) loaded`);
             }
         });
+        console.log('\x1b[36m%s\x1b[0m', '[modules] everything loaded successfully');
     }
 
 }

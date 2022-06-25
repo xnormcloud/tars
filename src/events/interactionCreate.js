@@ -5,7 +5,7 @@ module.exports = {
     name: 'interactionCreate',
     once: false,
     // eslint-disable-next-line no-unused-vars
-    async run(interaction) {
+    async run(logChannel, interaction) {
         /* slash commands
         // interaction commands
         if (interaction.isCommand()) {
@@ -21,7 +21,6 @@ module.exports = {
                 await command.execute(interaction);
                 // log
                 const avatar = interaction.member.user.displayAvatarURL({ size: 4096, dynamic: true });
-                const logchannel = interaction.member.guild.channels.cache.get(config.channels.log);
                 const embed = {
                     color: config.colors.blue,
                     author: { name: 'Command Used', icon_url: avatar },
@@ -30,7 +29,7 @@ module.exports = {
                     timestamp: new Date(),
                     footer: { text: `ID: ${interaction.user.id}` },
                 };
-                logchannel.send({ embeds: [embed] });
+                logChannel.send({ embeds: [embed] });
             } catch (error) {
                 console.log(error);
                 await interaction.reply({

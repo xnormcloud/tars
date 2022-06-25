@@ -3,10 +3,9 @@ const config = require('../config/config.json');
 module.exports = {
     name: 'guildMemberUpdate',
     once: false,
-    run(oldMember, newMember) {
+    run(logChannel, oldMember, newMember) {
         let cont;
         const avatar = newMember.user.displayAvatarURL({ size: 4096, dynamic: true });
-        const logchannel = newMember.guild.channels.cache.get(config.channels.log);
         // role changed
         if (oldMember._roles.length !== newMember._roles.length) {
             // shared embed
@@ -27,7 +26,7 @@ module.exports = {
                         embed.fields = [ { name: 'Role', value: `<@&${newMember._roles[cont]}>` } ];
                     }
                 }
-                logchannel.send({ embeds: [embed] });
+                logChannel.send({ embeds: [embed] });
             }
             // role deleted
             else if (newMember._roles.length < oldMember._roles.length) {
@@ -40,7 +39,7 @@ module.exports = {
                         embed.fields = [ { name: 'Role', value: `<@&${oldMember._roles[cont]}>` } ];
                     }
                 }
-                logchannel.send({ embeds: [embed] });
+                logChannel.send({ embeds: [embed] });
             }
         }
         // nickname changed
@@ -70,7 +69,7 @@ module.exports = {
             else {
                 embed.fields[1] = { name: 'Old Username', value: oldMember.user.username };
             }
-            logchannel.send({ embeds: [embed] });
+            logChannel.send({ embeds: [embed] });
         }
     },
 };

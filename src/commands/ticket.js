@@ -9,10 +9,10 @@ module.exports = {
     subcommands: [
         { name: 'create', description: 'creates new ticket', parameters: ['type', 'customerid'] },
     ],
-    run(message, args) {
+    run(guild, message, args) {
         switch (args[0]) {
         case 'create':
-            ticket.create(args[1], args[2], message);
+            ticket.create(guild, message, args[1], args[2]);
             break;
         default:
             message.reply('Unknown subcommand provided');

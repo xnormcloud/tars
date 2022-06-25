@@ -1,14 +1,14 @@
 const { MessageActionRow, MessageButton } = require('discord.js');
 const config = require('../config/config.json');
 
-module.exports.create = (type, customer, message) => {
+module.exports.create = (guild, message, type, customer) => {
     const category = config.categories.filter(group => group.name === type)[0];
     if (category !== undefined) {
-        if (!exists(category, customer, message)) {
+        if (!exists(guild, category, customer)) {
             try {
-                message.guild.channels.create(customer).then(channel => {
+                guild.channels.create(customer).then(channel => {
                     channel.setParent(category.id).then(() => {
-                        const bot = message.guild.members.cache.filter(member => member.id === config.clientid).values().next().value;
+                        const bot = guild.members.cache.filter(member => member.id === config.clientid).values().next().value;
                         const embed = {
                             color: config.colors.blue,
                             author: { name: `Welcome to ${category.name} ticket` },
@@ -37,25 +37,30 @@ module.exports.create = (type, customer, message) => {
                                     .setLabel('🌐 Website')
                                     .setStyle('LINK'),
                             );
-                        channel.send({ embeds: [embed], components: [buttons] });
-                        message.reply(`Channel successfully created in \`${category.name}\` category!`);
+                        channel.send({ embeds: [embed], components: [buttons] }).then(() => {
+                            if (category.permission != null) {
+                                message.reply(`Channel successfully created in \`${category.name}\` category!`);
+                            }
+                        });
                     });
                 });
             }
             catch (e) {
                 console.error(e);
-                message.reply('There was a problem creating the ticket');
+                if (message != null) {
+                    message.reply('There was a problem creating the ticket');
+                }
             }
         }
-        else {
+        else if (message != null) {
             message.reply(`Already existing channel in \`${category.name}\` category!`);
         }
     }
-    else {
+    else if (message != null) {
         message.reply(`\`${type}\` category doesn't exists!`);
     }
 };
 
-function exists(category, customer, message) {
-    return message.guild.channels.cache.filter(channel => channel.name === customer && channel.parentId === category.id).size !== 0;
+function exists(guild, category, customer) {
+    return guild.channels.cache.filter(channel => channel.name === customer && channel.parentId === category.id).size !== 0;
 }

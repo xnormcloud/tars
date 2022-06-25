@@ -3,10 +3,9 @@ const config = require('../config/config.json');
 module.exports = {
     name: 'messageDelete',
     once: false,
-    run(message) {
+    run(logChannel, message) {
         // log
         const avatar = message.author.displayAvatarURL({ size: 4096, dynamic: true });
-        const logchannel = message.guild.channels.cache.get(config.channels.log);
         const embed = {
             color: config.colors.red,
             author: { name: 'Message Deleted', icon_url: avatar },
@@ -18,6 +17,6 @@ module.exports = {
             timestamp: new Date(),
             footer: { text: `ID: ${message.author.id}` },
         };
-        logchannel.send({ embeds: [embed] });
+        logChannel.send({ embeds: [embed] });
     },
 };
