@@ -16,6 +16,7 @@
         {
             "name": "order",
             "id": "ORDER CATEGORY ID",
+            "log": "ORDER LOG CHANNEL ID",
             "info": [
                 "order ticket",
                 "next line :)"
@@ -24,6 +25,7 @@
         {
             "name": "support",
             "id": "SUPPORT CATEGORY ID",
+            "log": "SUPPORT LOG CHANNEL ID",
             "info": [
                 "support ticket",
                 "next line :)"
@@ -32,6 +34,7 @@
         {
             "name": "invoice",
             "id": "INVOICE CATEGORY ID",
+            "log": "INVOICE LOG CHANNEL ID",
             "info": [
                 "invoice ticket",
                 "next line :)"

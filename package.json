@@ -7,6 +7,7 @@
   "author": "legendnightt <alex@legend.sh>",
   "license": "GPL-3.0",
   "dependencies": {
+    "discord-html-transcripts": "^2.5.8",
     "discord.js": "^13.6.0"
   },
   "devDependencies": {
