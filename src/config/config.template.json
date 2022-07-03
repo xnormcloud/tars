@@ -8,10 +8,10 @@
         "log": "GENERAL LOG CHANNEL ID",
         "error": "ERROR LOG CHANNEL ID"
     },
-    "categories" : [
+    "tickets" : [
         {
             "name": "order",
-            "id": "ORDER CATEGORY ID",
+            "category": "ORDER CATEGORY ID",
             "log": "ORDER LOG CHANNEL ID",
             "info": [
                 "order ticket",
@@ -20,7 +20,7 @@
         },
         {
             "name": "support",
-            "id": "SUPPORT CATEGORY ID",
+            "category": "SUPPORT CATEGORY ID",
             "log": "SUPPORT LOG CHANNEL ID",
             "info": [
                 "support ticket",
@@ -29,7 +29,7 @@
         },
         {
             "name": "invoice",
-            "id": "INVOICE CATEGORY ID",
+            "category": "INVOICE CATEGORY ID",
             "log": "INVOICE LOG CHANNEL ID",
             "info": [
                 "invoice ticket",

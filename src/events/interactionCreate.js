@@ -50,17 +50,17 @@ module.exports = {
                 ephemeral: true,
             });
         }
-        const type = config.categories.find(category => category.id === channel.parent.id);
-        if (type === undefined) return;
+        const ticketInfo = config.tickets.find(ticketSearch => ticketSearch.category === channel.parent.id);
+        if (ticketInfo === undefined) return;
         switch (customId) {
         case 'save_close_ticket':
-            await ticket.close(guild, type.name, channel.name, interaction, null);
+            await ticket.close(guild, ticketInfo.name, channel.name, interaction, null);
             break;
         case 'lock_ticket':
-            ticket.alternateLock(guild, type.name, channel.name, true, interaction, null);
+            ticket.alternateLock(guild, ticketInfo.name, channel.name, true, interaction, null);
             break;
         case 'unlock_ticket':
-            ticket.alternateLock(guild, type.name, channel.name, false, interaction, null);
+            ticket.alternateLock(guild, ticketInfo.name, channel.name, false, interaction, null);
             break;
         }
     },
