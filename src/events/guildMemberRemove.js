@@ -3,10 +3,9 @@ const config = require('../config/config.json');
 module.exports = {
     name: 'guildMemberRemove',
     once: false,
-    run(member) {
+    run(logChannel, member) {
         // log
         const avatar = member.user.displayAvatarURL({ size: 4096, dynamic: true });
-        const logchannel = member.guild.channels.cache.get(config.channels.log);
         const embed = {
             color: config.colors.red,
             author: { name: 'Member Left', icon_url: avatar },
@@ -15,6 +14,6 @@ module.exports = {
             timestamp: new Date(),
             footer: { text: `ID: ${member.id}` },
         };
-        logchannel.send({ embeds: [embed] });
+        logChannel.send({ embeds: [embed] });
     },
 };

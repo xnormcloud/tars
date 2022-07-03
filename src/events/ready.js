@@ -27,7 +27,7 @@ module.exports = {
                 // discord server mode
                 else {
                     await rest.put(
-                        Routes.applicationGuildCommands(client.user.id, config.guildid),
+                        Routes.applicationGuildCommands(client.user.id, config.guild),
                         {
                             body: commands,
                         },
@@ -41,7 +41,7 @@ module.exports = {
         */
         // log
         console.log('\x1b[36m%s\x1b[0m', `${client.user.username} ready!`);
-        const logchannel = client.channels.cache.find(channel => channel.id === config.channels.log);
+        const logChannel = client.channels.cache.find(channel => channel.id === config.channels.log);
         const embed = {
             color: config.colors.blue,
             author: { name: `☑️ ${client.user.username} ON!`, icon_url: client.user.displayAvatarURL({ size: 4096, dynamic: true }) },
@@ -49,6 +49,6 @@ module.exports = {
             timestamp: new Date(),
             footer: { text: `ID: ${client.user.id}` },
         };
-        logchannel.send({ embeds: [embed] });
+        logChannel.send({ embeds: [embed] });
     },
 };

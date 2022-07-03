@@ -1,23 +1,49 @@
 {
     "token": "BOT TOKEN",
-    "mongo": "MONGODB URL",
     "prefix": "COMMANDS PREFIX",
-    "guildid": "GUILD ID",
-    "clientid": "BOT ID",
-    "roles": {
-        "staff": "STAFF ROLE ID",
-        "user": "USER ROLE ID"
-    },
+    "guild": "GUILD ID",
+    "client": "BOT ID",
     "channels": {
         "join": "JOIN CHANNEL ID",
+        "ticket": "OPEN TICKET CHANNEL ID",
         "log": "GENERAL LOG CHANNEL ID",
         "error": "ERROR LOG CHANNEL ID"
     },
-    "categories" : [{
-        "order" : "ORDER CATEGORY ID",
-        "support" : "SUPPORT CATEGORY ID",
-        "invoice" : "INVOICE CATEGORY ID"
-    }],
+    "tickets": [
+        {
+            "name": "order",
+            "category": "ORDER CATEGORY ID",
+            "log": "ORDER LOG CHANNEL ID",
+            "description": "ORDER DESCRIPTION",
+            "emoji": "ORDER EMOJI",
+            "info": [
+                "order ticket",
+                "next line :)"
+            ]
+        },
+        {
+            "name": "support",
+            "category": "SUPPORT CATEGORY ID",
+            "log": "SUPPORT LOG CHANNEL ID",
+            "description": "SUPPORT DESCRIPTION",
+            "emoji": "SUPPORT EMOJI",
+            "info": [
+                "support ticket",
+                "next line :)"
+            ]
+        },
+        {
+            "name": "invoice",
+            "category": "INVOICE CATEGORY ID",
+            "log": "INVOICE LOG CHANNEL ID",
+            "description": "INVOICE DESCRIPTION",
+            "emoji": "INVOICE EMOJI",
+            "info": [
+                "invoice ticket",
+                "next line :)"
+            ]
+        }
+    ],
     "url": {
         "net": ".NET WEBSITE",
         "cloud": ".CLOUD WEBSITE",
@@ -30,7 +56,7 @@
         "red": "#FF0000"
     },
     "presence": {
-        "activites": {
+        "activities": {
             "name": "ACTIVITY NAME",
             "type": [
                 "PLAYING",
