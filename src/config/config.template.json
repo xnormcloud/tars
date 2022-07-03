@@ -3,10 +3,6 @@
     "prefix": "COMMANDS PREFIX",
     "guild": "GUILD ID",
     "client": "BOT ID",
-    "roles": {
-        "staff": "STAFF ROLE ID",
-        "user": "USER ROLE ID"
-    },
     "channels": {
         "join": "JOIN CHANNEL ID",
         "log": "GENERAL LOG CHANNEL ID",
