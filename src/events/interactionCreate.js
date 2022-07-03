@@ -51,7 +51,7 @@ module.exports = {
             await ticket.close(guild, type.name, channel.name, interaction, null);
             break;
         case 'lock_ticket':
-            interaction.reply('lock_ticket');
+            ticket.lock(guild, type.name, channel.name, interaction, null);
             break;
         case 'unlock_ticket':
             interaction.reply('unlock_ticket');
