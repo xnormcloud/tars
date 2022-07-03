@@ -19,7 +19,10 @@ module.exports = {
             ticket.close(guild, args[1], args[2], null, message);
             break;
         case 'lock':
-            ticket.lock(guild, args[1], args[2], null, message);
+            ticket.alternateLock(guild, args[1], args[2], true, null, message);
+            break;
+        case 'unlock':
+            ticket.alternateLock(guild, args[1], args[2], false, null, message);
             break;
         default:
             message.reply('Unknown subcommand provided');

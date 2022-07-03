@@ -115,7 +115,9 @@ module.exports = {
         }
     },
 
-    lock: function(guild, type, customer, interaction, message) {
+    alternateLock: function(guild, type, customer, lock, interaction, message) {
+        // lock = true => lock ticket
+        // lock = false => unlock ticket
         const category = findCategory(type);
         if (category !== undefined) {
             if (exists(guild, category, customer)) {
@@ -126,13 +128,13 @@ module.exports = {
                     // test with cosolegend account
                     const test_account = guild.members.cache.find(member => member.id === '584488107643240454');
                     ticketChannel.permissionOverwrites.edit(test_account, {
-                        SEND_MESSAGES: false,
+                        SEND_MESSAGES: !lock,
                     }).then(async () => {
                         await ticketChannel.messages.fetch({ after: 1, limit: 1 }).then(ticketMessages => {
                             const embedTicketMessage = ticketMessages.first();
-                            const [embed, buttons] = createTicketEmbed(guild, ticketChannel, category, true);
+                            const [embed, buttons] = createTicketEmbed(guild, ticketChannel, category, lock);
                             embedTicketMessage.edit({ embeds: [embed], components: [buttons] }).then(() => {
-                                const display_message = '🔒 Ticket locked!';
+                                const display_message = (lock ? '🔒' : '🔓') + ' Ticket ' + (lock ? 'locked' : 'unlocked') + '!';
                                 if (interaction != null) {
                                     interaction.reply(display_message);
                                 }
@@ -145,7 +147,7 @@ module.exports = {
                     });
                 }
                 catch (error) {
-                    const display_message = 'There was a problem locking the ticket';
+                    const display_message = 'There was a problem ' + (lock ? 'locking' : 'unlocking') + ' the ticket';
                     if (interaction != null) {
                         interaction.reply(display_message);
                     }

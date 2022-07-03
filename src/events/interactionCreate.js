@@ -44,6 +44,12 @@ module.exports = {
         if (!interaction.isButton()) return;
         // eslint-disable-next-line no-unused-vars
         const { guild, customId, channel, member } = interaction;
+        if (!member.permissions.has('ADMINISTRATOR')) {
+            return interaction.reply({
+                content: 'You don\'t have permission to use this button.',
+                ephemeral: true,
+            });
+        }
         const type = config.categories.find(category => category.id === channel.parent.id);
         if (type === undefined) return;
         switch (customId) {
@@ -51,10 +57,10 @@ module.exports = {
             await ticket.close(guild, type.name, channel.name, interaction, null);
             break;
         case 'lock_ticket':
-            ticket.lock(guild, type.name, channel.name, interaction, null);
+            ticket.alternateLock(guild, type.name, channel.name, true, interaction, null);
             break;
         case 'unlock_ticket':
-            interaction.reply('unlock_ticket');
+            ticket.alternateLock(guild, type.name, channel.name, false, interaction, null);
             break;
         }
     },
