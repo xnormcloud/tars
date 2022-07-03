@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 const config = require('../config/config.json');
+const ticket = require('../utils/ticket.js');
 
 module.exports = {
     name: 'interactionCreate',
@@ -39,5 +40,22 @@ module.exports = {
             };
         };
         */
+        // tickets
+        if (!interaction.isButton()) return;
+        // eslint-disable-next-line no-unused-vars
+        const { guild, customId, channel, member } = interaction;
+        const type = config.categories.find(category => category.id === channel.parent.id);
+        if (type === undefined) return;
+        switch (customId) {
+        case 'save_close_ticket':
+            await ticket.close(guild, type.name, channel.name, interaction, null);
+            break;
+        case 'lock_ticket':
+            interaction.reply('lock_ticket');
+            break;
+        case 'unlock_ticket':
+            interaction.reply('unlock_ticket');
+            break;
+        }
     },
 };
