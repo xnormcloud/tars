@@ -42,26 +42,42 @@ module.exports = {
         */
         // tickets
         if (!interaction.isButton()) return;
-        // eslint-disable-next-line no-unused-vars
         const { guild, customId, channel, member } = interaction;
-        if (!member.permissions.has('ADMINISTRATOR')) {
-            return interaction.reply({
-                content: 'You don\'t have permission to use this button.',
-                ephemeral: true,
-            });
+        const openTicketInteractionList = ticket.getOpenInteractionList();
+        if (openTicketInteractionList.some(openTicketInteraction => openTicketInteraction.id === customId)) {
+            // TODO: check if the user is notion database as customer and answer accordingly
+            // eslint-disable-next-line no-case-declarations
+            const ticketType = openTicketInteractionList.find(openTicketInteraction => openTicketInteraction.id === customId).name;
+            // temp customer for testing
+            ticket.open(guild, ticketType, '4209d68bf0794a3ea8df5261c82d2891', interaction, null);
         }
-        const ticketInfo = config.tickets.find(ticketSearch => ticketSearch.category === channel.parent.id);
-        if (ticketInfo === undefined) return;
-        switch (customId) {
-        case 'save_close_ticket':
-            await ticket.close(guild, ticketInfo.name, channel.name, interaction, null);
-            break;
-        case 'lock_ticket':
-            ticket.alternateLock(guild, ticketInfo.name, channel.name, true, interaction, null);
-            break;
-        case 'unlock_ticket':
-            ticket.alternateLock(guild, ticketInfo.name, channel.name, false, interaction, null);
-            break;
+        else if (isAdmin(member, interaction)) {
+            switch (customId) {
+            case 'save_close_ticket':
+                await ticket.close(guild, getTicketInfo(channel).name, channel.name, interaction, null);
+                break;
+            case 'lock_ticket':
+                ticket.alternateLock(guild, getTicketInfo(channel).name, channel.name, true, interaction, null);
+                break;
+            case 'unlock_ticket':
+                ticket.alternateLock(guild, getTicketInfo(channel).name, channel.name, false, interaction, null);
+                break;
+            }
         }
     },
 };
+
+function isAdmin(member, interaction) {
+    if (!member.permissions.has('ADMINISTRATOR')) {
+        interaction.reply({
+            content: 'You don\'t have permission to use this button.',
+            ephemeral: true,
+        });
+        return false;
+    }
+    return true;
+}
+
+function getTicketInfo(channel) {
+    return config.tickets.find(ticketSearch => ticketSearch.category === channel.parent.id);
+}

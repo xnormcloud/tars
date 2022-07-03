@@ -1,8 +1,42 @@
 const { MessageActionRow, MessageButton } = require('discord.js');
 const { createTranscript } = require('discord-html-transcripts');
 const config = require('../config/config.json');
+const { capitalize } = require('../utils/string');
 
 module.exports = {
+
+    initDiscordMessage: async function(guild) {
+        const ticketMessageChannel = guild.channels.cache.find(channel => channel.id === config.channels.ticket);
+        await ticketMessageChannel.messages.fetch({ after: 1, limit: 1 }).then(ticketMessages => {
+            if (ticketMessages.size !== 0) return;
+            const bot = guild.members.cache.find(member => member.id === config.client);
+            const embed = {
+                color: config.colors.blue,
+                author: { name: 'Open Ticket Tool' },
+                description: 'Select what category you want to open a ticket inside',
+                thumbnail: { url: bot.displayAvatarURL({ size: 4096, dynamic: true }) },
+            };
+            const buttons = new MessageActionRow();
+            const fields = [];
+            getOpenInteractionList().map(openTicketInteraction => {
+                const openTicketInteractionName = capitalize(openTicketInteraction.name);
+                fields.push({
+                    name: openTicketInteractionName,
+                    value: openTicketInteraction.description,
+                });
+                buttons.addComponents(
+                    new MessageButton()
+                        .setCustomId(openTicketInteraction.id)
+                        .setLabel(`${openTicketInteraction.emoji} ${openTicketInteractionName}`)
+                        .setStyle('SUCCESS'),
+                );
+            });
+            embed.fields = fields;
+            ticketMessageChannel.send({ embeds: [embed], components: [buttons] });
+        });
+    },
+
+    getOpenInteractionList,
 
     open: function(guild, ticketType, customer, interaction, message) {
         const ticketInfo = getTicketInfo(ticketType);
@@ -20,8 +54,14 @@ module.exports = {
                                     VIEW_CHANNEL: true,
                                     SEND_MESSAGES: true,
                                 }).then(() => {
-                                    if (message != null) {
-                                        message.reply(`Channel successfully opened in \`${ticketInfo.name}\` category!`);
+                                    if (interaction != null) {
+                                        interaction.reply({
+                                            content: `${capitalize(ticketInfo.name)} Ticket <#${ticketChannel.id}> successfully opened!`,
+                                            ephemeral: true,
+                                        });
+                                    }
+                                    else if (message != null) {
+                                        message.reply(`Ticket successfully opened in ${ticketInfo.name} category!`);
                                     }
                                 });
                             });
@@ -42,12 +82,19 @@ module.exports = {
                     console.error(e);
                 }
             }
+            else if (interaction != null) {
+                const ticketChannelId = guild.channels.cache.find(channel => channel.name === customer && channel.parentId === ticketInfo.category).id;
+                interaction.reply({
+                    content: `You already have a ${capitalize(ticketInfo.name)} Ticket <#${ticketChannelId}> opened!`,
+                    ephemeral: true,
+                });
+            }
             else if (message != null) {
-                message.reply(`Already existing channel in \`${ticketInfo.name}\` category!`);
+                message.reply(`Already existing channel in ${ticketInfo.name} category!`);
             }
         }
         else if (message != null) {
-            message.reply(`\`${ticketType}\` category doesn't exists!`);
+            message.reply(`${ticketType} category doesn't exists!`);
         }
     },
 
@@ -90,7 +137,7 @@ module.exports = {
                     setTimeout(() => {
                         ticketChannel.delete().then(() => {
                             if (message != null) {
-                                message.reply(`Channel successfully closed from \`${ticketInfo.name}\` category!`);
+                                message.reply(`Channel successfully closed from ${ticketInfo.name} category!`);
                             }
                         });
                     }, 5000);
@@ -107,11 +154,11 @@ module.exports = {
                 }
             }
             else if (message != null) {
-                message.reply(`No provided customer channel in \`${ticketInfo.name}\` category!`);
+                message.reply(`No provided customer channel in ${ticketInfo.name} category!`);
             }
         }
         else if (message != null) {
-            message.reply(`\`${ticketType}\` category doesn't exists!`);
+            message.reply(`${ticketType} category doesn't exists!`);
         }
     },
 
@@ -141,8 +188,7 @@ module.exports = {
                                 else if (message != null) {
                                     message.reply(display_message);
                                 }
-                            },
-                            );
+                            });
                         });
                     });
                 }
@@ -158,33 +204,45 @@ module.exports = {
                 }
             }
             else if (message != null) {
-                message.reply(`No provided customer channel in \`${ticketInfo.name}\` category!`);
+                message.reply(`No provided customer channel in ${ticketInfo.name} category!`);
             }
         }
         else if (message != null) {
-            message.reply(`\`${ticketType}\` category doesn't exists!`);
+            message.reply(`${ticketType} category doesn't exists!`);
         }
     },
 
 };
 
+function getOpenInteractionList() {
+    // no button for invoice tickets, those are auto generated
+    return config.tickets.filter(ticketInfo => ticketInfo.name !== 'invoice').map(ticketInfo => {
+        return {
+            name: ticketInfo.name,
+            description: ticketInfo.description,
+            emoji: ticketInfo.emoji,
+            id: 'open_' + ticketInfo.name + '_ticket',
+        };
+    });
+}
+
 function getTicketInfo(ticketType) {
-    return config.tickets.find(group => group.name === ticketType);
+    return config.tickets.find(ticketInfo => ticketInfo.name === ticketType);
 }
 
 function exists(guild, ticketInfo, customer) {
-    return guild.channels.cache.find(channel => channel.name === customer && channel.parentId === ticketInfo.category) !== undefined;
+    return guild.channels.cache.some(channel => channel.name === customer && channel.parentId === ticketInfo.category);
 }
 
 function createTicketEmbed(guild, ticketChannel, ticketInfo, locked) {
     const bot = guild.members.cache.find(member => member.id === config.client);
     const embed = {
         color: locked ? config.colors.red : config.colors.blue,
-        author: { name: `Welcome to ${ticketInfo.name} ticket` },
-        description: 'Please be patient, we will answer as soon as possible',
+        author: { name: `Welcome to ${capitalize(ticketInfo.name)} Ticket` },
+        description: 'Please be patient, we will answer as soon as possible.',
         thumbnail: { url: bot.displayAvatarURL({ size: 4096, dynamic: true }) },
         fields: [
-            { name: 'Important info', value: ticketInfo.info.join('\n') },
+            { name: 'Important information', value: ticketInfo.info.join('\n') },
             { name: 'Status', value: locked ? '🔒 Locked' : '🔓 Unlocked' },
         ],
         timestamp: new Date(),

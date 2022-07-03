@@ -1,14 +1,5 @@
 const config = require('../config/config.json');
 
-function runCommand(command, commands, guild, message, args) {
-    if (command.name === 'help') {
-        command.run(message, commands);
-    }
-    else {
-        command.run(guild, message, args);
-    }
-}
-
 module.exports = {
     name: 'messageCreate',
     once: false,
@@ -40,3 +31,12 @@ module.exports = {
         }
     },
 };
+
+function runCommand(command, commands, guild, message, args) {
+    if (command.name === 'help') {
+        command.run(message, commands);
+    }
+    else {
+        command.run(guild, message, args);
+    }
+}
