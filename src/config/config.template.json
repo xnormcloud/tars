@@ -11,6 +11,17 @@
     },
     "tickets": [
         {
+            "name": "information",
+            "category": "INFORMATION CATEGORY ID",
+            "log": "INFORMATION LOG CHANNEL ID",
+            "description": "INFORMATION DESCRIPTION",
+            "emoji": "INFORMATION EMOJI",
+            "info": [
+                "information ticket",
+                "next line :)"
+            ]
+        },
+        {
             "name": "order",
             "category": "ORDER CATEGORY ID",
             "log": "ORDER LOG CHANNEL ID",
