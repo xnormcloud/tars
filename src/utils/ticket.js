@@ -1,7 +1,7 @@
 const { MessageActionRow, MessageButton } = require('discord.js');
 const { createTranscript } = require('discord-html-transcripts');
-const config = require('../config/config.json');
-const { capitalize } = require('../utils/string');
+const config = require('../../config.json');
+const { capitalize } = require('../utils/string.js');
 
 module.exports = {
 

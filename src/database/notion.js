@@ -1,19 +1,18 @@
 const { Client } = require('@notionhq/client');
-const {
-    notion_token,
-    notion_user_database_id,
-    notion_groups_database_id,
-} = require('../config/config.json');
+require('dotenv').config();
+const notionToken = process.env.NOTION_TOKEN;
+const notionUsersDatabaseId = process.env.NOTION_USERS_DATABASE_ID;
+const notionGroupsDatabaseId = process.env.NOTION_GROUPS_DATABASE_ID;
 
 const notion = new Client({
-    auth: notion_token,
+    auth: notionToken,
 });
 
 module.exports = {
 
     userTypeById: async function(discordId) {
         const response = await notion.databases.query({
-            database_id: notion_user_database_id,
+            database_id: notionUsersDatabaseId,
             filter:{
                 'property': 'DiscordId',
                 'rich_text': {
@@ -32,7 +31,7 @@ module.exports = {
             return 400;
         }
         await notion.pages.create({
-            parent: { database_id: notion_user_database_id },
+            parent: { database_id: notionUsersDatabaseId },
             properties: {
                 DiscordUsername: {
                     title: [
@@ -61,7 +60,7 @@ module.exports = {
 
     getUsersIdsByGroupId: async function(groupId) {
         const usersInGroupResponse = await notion.databases.query({
-            database_id: notion_groups_database_id,
+            database_id: notionGroupsDatabaseId,
             filter:{
                 'property': 'GroupId',
                 'rich_text': {
@@ -75,7 +74,7 @@ module.exports = {
         });
         const result = await Promise.all(usersInGroup.map(async (userPageId) => {
             const response = await notion.databases.query({
-                database_id: notion_user_database_id,
+                database_id: notionUsersDatabaseId,
                 filter: {
                     'property': 'RecordId',
                     'rich_text': {
@@ -92,7 +91,7 @@ module.exports = {
 
     getGroupsByUserId: async function(discordId) {
         const groupsInUser = await notion.databases.query({
-            database_id: notion_user_database_id,
+            database_id: notionUsersDatabaseId,
             filter:{
                 'property': 'DiscordId',
                 'rich_text': {
@@ -106,7 +105,7 @@ module.exports = {
         });
         const result = await Promise.all(groupsInUserIds.map(async (groupPageId) => {
             const response = await notion.databases.query({
-                database_id: notion_groups_database_id,
+                database_id: notionGroupsDatabaseId,
                 filter: {
                     'property': 'GroupId',
                     'rich_text': {
@@ -124,7 +123,7 @@ module.exports = {
 
 async function findById(discordId) {
     const response = await notion.databases.query({
-        database_id: notion_user_database_id,
+        database_id: notionUsersDatabaseId,
         filter:{
             'property': 'DiscordId',
             'rich_text': {

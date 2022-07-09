@@ -1,13 +1,7 @@
 {
-    "token": "BOT TOKEN",
     "prefix": "COMMANDS PREFIX",
     "guild": "GUILD ID",
     "client": "BOT ID",
-    "database": {
-        "notion_token": "NOTION TOKEN",
-        "notion_user_database_id": "NOTION USER DATABASE ID",
-        "notion_groups_database_id": "NOTION GROUPS DATABASE ID"
-    },
     "channels": {
         "join": "JOIN CHANNEL ID",
         "ticket": "OPEN TICKET CHANNEL ID",
