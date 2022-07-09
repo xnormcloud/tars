@@ -6,16 +6,17 @@
   "repository": "git@github.com:xnormnet/xnorm-cloud-bot.git",
   "author": "legendnightt <alex@legend.sh>",
   "license": "GPL-3.0",
+  "scripts": {
+    "bot": "node .",
+    "test": "nodemon ."
+  },
   "dependencies": {
+    "@notionhq/client": "^1.0.4",
     "discord-html-transcripts": "^2.5.8",
     "discord.js": "^13.6.0"
   },
   "devDependencies": {
     "eslint": "^8.12.0",
     "nodemon": "^2.0.15"
-  },
-  "scripts": {
-    "bot": "node .",
-    "test": "nodemon ."
   }
 }

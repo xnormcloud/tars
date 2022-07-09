@@ -1,7 +1,7 @@
 const { Client, Collection } = require('discord.js');
 const fs = require('fs');
 const config = require('../config/config.json');
-const { initDiscordMessage } = require('../utils/ticket');
+const { initDiscordMessage } = require('../utils/ticket.js');
 
 const path = require('path');
 const dirname = path.resolve();
@@ -69,7 +69,7 @@ class ExtendedClient extends Client {
         });
         // ticket discord message init
         await initDiscordMessage(guild).then(() =>
-            console.log('\x1b[32m%s\x1b[0m', '[ticket] discord message init succeed'),
+            console.log('\x1b[36m%s\x1b[0m', '[ticket] discord message init succeed'),
         );
         console.log('\x1b[36m%s\x1b[0m', '[modules] everything loaded successfully');
     }
