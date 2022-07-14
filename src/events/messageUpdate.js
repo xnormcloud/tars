@@ -4,6 +4,8 @@ module.exports = {
     name: 'messageUpdate',
     once: false,
     run(logChannel, oldMessage, newMessage) {
+        // prevents crashing if message content is empty
+        if (oldMessage.content === '' || newMessage.content === '') return;
         // checks if it's a content change
         if (newMessage.content !== oldMessage.content) {
             // log
