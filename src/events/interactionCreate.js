@@ -53,8 +53,7 @@ module.exports = {
             const groups = await notion.getGroupsByUserId(member.id);
             // open ticket for not customer
             if (groups.length === 0) {
-                const userId = (await notion.findById(member.id)).id;
-                await ticket.open(guild, ticketInfo.name, userId, interaction, null);
+                await ticket.open(guild, ticketInfo.name, member.id, interaction, null);
             }
             // open ticket for customer
             else {

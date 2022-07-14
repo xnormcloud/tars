@@ -48,14 +48,25 @@ module.exports = {
                         channel.setParent(ticketInfo.category).then(ticketChannel => {
                             const [embed, buttons] = createTicketEmbed(guild, ticketChannel, ticketInfo, false);
                             ticketChannel.send({ embeds: [embed], components: [buttons] }).then(async () => {
-                                const customerIds = (await notion.getUsersIdsByGroupId(customer)).UsersDiscordIds;
-                                for (const customerId of customerIds) {
-                                    const customerDiscord = guild.members.cache.find(member => member.id === customerId);
-                                    if (customerDiscord !== undefined) {
-                                        await ticketChannel.permissionOverwrites.edit(customerDiscord, {
-                                            VIEW_CHANNEL: true,
-                                            SEND_MESSAGES: true,
-                                        });
+                                let customerDiscord = guild.members.cache.find(member => member.id === customer);
+                                // not group, only one user
+                                if (customerDiscord !== undefined) {
+                                    await ticketChannel.permissionOverwrites.edit(customerDiscord, {
+                                        VIEW_CHANNEL: true,
+                                        SEND_MESSAGES: true,
+                                    });
+                                }
+                                // group
+                                else {
+                                    const customerIds = (await notion.getUsersIdsByGroupId(customer)).UsersDiscordIds;
+                                    for (const customerId of customerIds) {
+                                        customerDiscord = guild.members.cache.find(member => member.id === customerId);
+                                        if (customerDiscord !== undefined) {
+                                            await ticketChannel.permissionOverwrites.edit(customerDiscord, {
+                                                VIEW_CHANNEL: true,
+                                                SEND_MESSAGES: true,
+                                            });
+                                        }
                                     }
                                 }
                                 if (interaction != null) {
@@ -164,13 +175,23 @@ module.exports = {
             if (exists(guild, ticketInfo, customer)) {
                 try {
                     const ticketChannel = getTicketChannel(guild, ticketInfo, customer);
-                    const customerIds = (await notion.getUsersIdsByGroupId(customer)).UsersDiscordIds;
-                    for (const customerId of customerIds) {
-                        const customerDiscord = guild.members.cache.find(member => member.id === customerId);
-                        if (customerDiscord !== undefined) {
-                            await ticketChannel.permissionOverwrites.edit(customerDiscord, {
-                                SEND_MESSAGES: !lock,
-                            });
+                    let customerDiscord = guild.members.cache.find(member => member.id === customer);
+                    // not group, only one user
+                    if (customerDiscord !== undefined) {
+                        await ticketChannel.permissionOverwrites.edit(customerDiscord, {
+                            SEND_MESSAGES: !lock,
+                        });
+                    }
+                    // group
+                    else {
+                        const customerIds = (await notion.getUsersIdsByGroupId(customer)).UsersDiscordIds;
+                        for (const customerId of customerIds) {
+                            customerDiscord = guild.members.cache.find(member => member.id === customerId);
+                            if (customerDiscord !== undefined) {
+                                await ticketChannel.permissionOverwrites.edit(customerDiscord, {
+                                    SEND_MESSAGES: !lock,
+                                });
+                            }
                         }
                     }
                     ticketChannel.messages.fetch({ after: 1, limit: 1 }).then(ticketMessages => {
