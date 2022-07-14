@@ -132,10 +132,9 @@ async function findById(discordId) {
         },
     });
     if (response.results.length === 1) {
-        const discordIdRes = response.results[0].properties.DiscordId.rich_text[0].plain_text;
         return {
-            id: discordIdRes,
-            username:response.results[0].properties.DiscordUsername.title[0].plain_text,
+            id: response.results[0].properties.RecordId.formula.string,
+            username: response.results[0].properties.DiscordUsername.title[0].plain_text,
         };
     }
     return -1;

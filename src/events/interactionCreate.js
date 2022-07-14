@@ -1,6 +1,7 @@
 const config = require('../../config.json');
 const notion = require('../database/notion.js');
 const ticket = require('../utils/ticket.js');
+const { capitalize } = require('../utils/string');
 
 module.exports = {
     name: 'interactionCreate',
@@ -44,29 +45,45 @@ module.exports = {
         const { guild, customId, channel, member } = interaction;
         const openTicketInteractionList = ticket.getOpenInteractionList();
         if (openTicketInteractionList.some(openTicketInteraction => openTicketInteraction.id === customId)) {
-            await interaction.deferReply({
-                ephemeral: true,
-            });
-            const ticketType = openTicketInteractionList.find(openTicketInteraction => openTicketInteraction.id === customId).name;
+            await interaction.deferReply({ ephemeral: true });
+            const ticketInfo = openTicketInteractionList.find(openTicketInteraction => openTicketInteraction.id === customId);
+            // TODO: reduce number of notion database calls to improve speed :)
+            // if not valid user for specified ticket return
+            if (!await isValidUser(member, ticketInfo.customer)) return interaction.editReply(`${capitalize(ticketInfo.name)} ticket only available for customers`);
             const groups = await notion.getGroupsByUserId(member.id);
-            await ticket.open(guild, ticketType, groups[0].id, interaction, null);
+            // open ticket for not customer
+            if (groups.length === 0) {
+                const userId = (await notion.findById(member.id)).id;
+                await ticket.open(guild, ticketInfo.name, userId, interaction, null);
+            }
+            // open ticket for customer
+            else {
+                await ticket.open(guild, ticketInfo.name, groups[0].id, interaction, null);
+            }
         }
         else if (isAdmin(member, interaction)) {
             await interaction.deferReply();
+            const ticketInfoName = config.tickets.find(ticketSearch => ticketSearch.category === channel.parent.id).name;
+            const channelName = channel.name;
             switch (customId) {
             case 'save_close_ticket':
-                await ticket.close(guild, getTicketInfo(channel).name, channel.name, interaction, null);
+                await ticket.close(guild, ticketInfoName, channelName, interaction, null);
                 break;
             case 'lock_ticket':
-                await ticket.alternateLock(guild, getTicketInfo(channel).name, channel.name, true, interaction, null);
+                await ticket.alternateLock(guild, ticketInfoName, channelName, true, interaction, null);
                 break;
             case 'unlock_ticket':
-                await ticket.alternateLock(guild, getTicketInfo(channel).name, channel.name, false, interaction, null);
+                await ticket.alternateLock(guild, ticketInfoName, channelName, false, interaction, null);
                 break;
             }
         }
     },
 };
+
+async function isValidUser(member, ticketInfoCustomer) {
+    if (ticketInfoCustomer) return await notion.userTypeById(member.id);
+    return true;
+}
 
 function isAdmin(member, interaction) {
     if (!member.permissions.has('ADMINISTRATOR')) {
@@ -77,8 +94,4 @@ function isAdmin(member, interaction) {
         return false;
     }
     return true;
-}
-
-function getTicketInfo(channel) {
-    return config.tickets.find(ticketSearch => ticketSearch.category === channel.parent.id);
 }

@@ -214,6 +214,7 @@ function getOpenInteractionList() {
     return config.tickets.filter(ticketInfo => ticketInfo.name !== 'invoice').map(ticketInfo => {
         return {
             name: ticketInfo.name,
+            customer: ticketInfo.customer,
             description: ticketInfo.description,
             emoji: ticketInfo.emoji,
             id: 'open_' + ticketInfo.name + '_ticket',
