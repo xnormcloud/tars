@@ -10,7 +10,7 @@ const notion = new Client({
 
 module.exports = {
 
-    userTypeById: async function(discordId) {
+    userTypeById: async discordId => {
         const response = await notion.databases.query({
             database_id: notionUsersDatabaseId,
             filter:{
@@ -26,7 +26,7 @@ module.exports = {
         return false;
     },
 
-    createUser: async function(discordId, discordUsername) {
+    createUser: async (discordId, discordUsername) => {
         if (await findById(discordId) !== -1) {
             return 400;
         }
@@ -58,7 +58,7 @@ module.exports = {
 
     findById,
 
-    getUsersIdsByGroupId: async function(groupId) {
+    getUsersIdsByGroupId: async groupId => {
         const usersInGroupResponse = await notion.databases.query({
             database_id: notionGroupsDatabaseId,
             filter:{
@@ -89,7 +89,7 @@ module.exports = {
         return { GroupName: groupName, UsersDiscordIds: result };
     },
 
-    getGroupsByUserId: async function(discordId) {
+    getGroupsByUserId: async discordId => {
         const groupsInUser = await notion.databases.query({
             database_id: notionUsersDatabaseId,
             filter:{

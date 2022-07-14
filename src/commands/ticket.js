@@ -10,19 +10,19 @@ module.exports = {
         { name: 'open', description: 'opens new ticket', parameters: ['type', 'customerid'] },
         { name: 'close', description: 'closes opened ticket', parameters: ['type', 'customerid'] },
     ],
-    run(guild, message, args) {
+    async run(guild, message, args) {
         switch (args[0]) {
         case 'open':
-            ticket.open(guild, args[1], args[2], null, message);
+            await ticket.open(guild, args[1], args[2], null, message);
             break;
         case 'close':
-            ticket.close(guild, args[1], args[2], null, message);
+            await ticket.close(guild, args[1], args[2], null, message);
             break;
         case 'lock':
-            ticket.alternateLock(guild, args[1], args[2], true, null, message);
+            await ticket.alternateLock(guild, args[1], args[2], true, null, message);
             break;
         case 'unlock':
-            ticket.alternateLock(guild, args[1], args[2], false, null, message);
+            await ticket.alternateLock(guild, args[1], args[2], false, null, message);
             break;
         default:
             message.reply('Unknown subcommand provided');

@@ -1,11 +1,10 @@
-// eslint-disable-next-line no-unused-vars
 const config = require('../../config.json');
+const notion = require('../database/notion.js');
 const ticket = require('../utils/ticket.js');
 
 module.exports = {
     name: 'interactionCreate',
     once: false,
-    // eslint-disable-next-line no-unused-vars
     async run(logChannel, interaction) {
         /* slash commands
         // interaction commands
@@ -45,22 +44,24 @@ module.exports = {
         const { guild, customId, channel, member } = interaction;
         const openTicketInteractionList = ticket.getOpenInteractionList();
         if (openTicketInteractionList.some(openTicketInteraction => openTicketInteraction.id === customId)) {
-            // TODO: check if the user is notion database as customer and answer accordingly
-            // eslint-disable-next-line no-case-declarations
+            await interaction.deferReply({
+                ephemeral: true,
+            });
             const ticketType = openTicketInteractionList.find(openTicketInteraction => openTicketInteraction.id === customId).name;
-            // temp customer for testing
-            ticket.open(guild, ticketType, '4209d68bf0794a3ea8df5261c82d2891', interaction, null);
+            const groups = await notion.getGroupsByUserId(member.id);
+            await ticket.open(guild, ticketType, groups[0].id, interaction, null);
         }
         else if (isAdmin(member, interaction)) {
+            await interaction.deferReply();
             switch (customId) {
             case 'save_close_ticket':
                 await ticket.close(guild, getTicketInfo(channel).name, channel.name, interaction, null);
                 break;
             case 'lock_ticket':
-                ticket.alternateLock(guild, getTicketInfo(channel).name, channel.name, true, interaction, null);
+                await ticket.alternateLock(guild, getTicketInfo(channel).name, channel.name, true, interaction, null);
                 break;
             case 'unlock_ticket':
-                ticket.alternateLock(guild, getTicketInfo(channel).name, channel.name, false, interaction, null);
+                await ticket.alternateLock(guild, getTicketInfo(channel).name, channel.name, false, interaction, null);
                 break;
             }
         }
