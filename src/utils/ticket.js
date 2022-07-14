@@ -1,13 +1,14 @@
 const { MessageActionRow, MessageButton } = require('discord.js');
 const { createTranscript } = require('discord-html-transcripts');
-const config = require('../config/config.json');
-const { capitalize } = require('../utils/string');
+const config = require('../../config.json');
+const notion = require('../database/notion.js');
+const { capitalize } = require('../utils/string.js');
 
 module.exports = {
 
-    initDiscordMessage: async function(guild) {
+    initDiscordMessage: async guild => {
         const ticketMessageChannel = guild.channels.cache.find(channel => channel.id === config.channels.ticket);
-        await ticketMessageChannel.messages.fetch({ after: 1, limit: 1 }).then(ticketMessages => {
+        ticketMessageChannel.messages.fetch({ after: 1, limit: 1 }).then(ticketMessages => {
             if (ticketMessages.size !== 0) return;
             const bot = guild.members.cache.find(member => member.id === config.client);
             const embed = {
@@ -38,7 +39,7 @@ module.exports = {
 
     getOpenInteractionList,
 
-    open: function(guild, ticketType, customer, interaction, message) {
+    open: async (guild, ticketType, customer, interaction, message) => {
         const ticketInfo = getTicketInfo(ticketType);
         if (ticketInfo !== undefined) {
             if (!exists(guild, ticketInfo, customer)) {
@@ -46,24 +47,34 @@ module.exports = {
                     guild.channels.create(customer).then(channel => {
                         channel.setParent(ticketInfo.category).then(ticketChannel => {
                             const [embed, buttons] = createTicketEmbed(guild, ticketChannel, ticketInfo, false);
-                            ticketChannel.send({ embeds: [embed], components: [buttons] }).then(() => {
-                                // TODO: VIEW_CHANNEL: true & SEND_MESSAGES: true for customers in ticketChannel
-                                // test with cosolegend account
-                                const test_account = guild.members.cache.find(member => member.id === '584488107643240454');
-                                ticketChannel.permissionOverwrites.edit(test_account, {
-                                    VIEW_CHANNEL: true,
-                                    SEND_MESSAGES: true,
-                                }).then(() => {
-                                    if (interaction != null) {
-                                        interaction.reply({
-                                            content: `${capitalize(ticketInfo.name)} Ticket <#${ticketChannel.id}> successfully opened!`,
-                                            ephemeral: true,
-                                        });
+                            ticketChannel.send({ embeds: [embed], components: [buttons] }).then(async () => {
+                                let customerDiscord = guild.members.cache.find(member => member.id === customer);
+                                // not group, only one user
+                                if (customerDiscord !== undefined) {
+                                    await ticketChannel.permissionOverwrites.edit(customerDiscord, {
+                                        VIEW_CHANNEL: true,
+                                        SEND_MESSAGES: true,
+                                    });
+                                }
+                                // group
+                                else {
+                                    const customerIds = (await notion.getUsersIdsByGroupId(customer)).UsersDiscordIds;
+                                    for (const customerId of customerIds) {
+                                        customerDiscord = guild.members.cache.find(member => member.id === customerId);
+                                        if (customerDiscord !== undefined) {
+                                            await ticketChannel.permissionOverwrites.edit(customerDiscord, {
+                                                VIEW_CHANNEL: true,
+                                                SEND_MESSAGES: true,
+                                            });
+                                        }
                                     }
-                                    else if (message != null) {
-                                        message.reply(`Ticket successfully opened in ${ticketInfo.name} category!`);
-                                    }
-                                });
+                                }
+                                if (interaction != null) {
+                                    interaction.editReply(`${capitalize(ticketInfo.name)} Ticket <#${ticketChannel.id}> successfully opened!`);
+                                }
+                                else if (message != null) {
+                                    message.reply(`Ticket successfully opened in ${ticketInfo.name} category!`);
+                                }
                             });
                         });
                     });
@@ -71,10 +82,7 @@ module.exports = {
                 catch (e) {
                     const display_message = 'There was a problem opening the ticket';
                     if (interaction != null) {
-                        interaction.reply({
-                            content: display_message,
-                            ephemeral: true,
-                        });
+                        interaction.editReply(display_message);
                     }
                     else if (message != null) {
                         message.reply(display_message);
@@ -84,10 +92,7 @@ module.exports = {
             }
             else if (interaction != null) {
                 const ticketChannelId = guild.channels.cache.find(channel => channel.name === customer && channel.parentId === ticketInfo.category).id;
-                interaction.reply({
-                    content: `You already have a ${capitalize(ticketInfo.name)} Ticket <#${ticketChannelId}> opened!`,
-                    ephemeral: true,
-                });
+                interaction.editReply(`You already have a ${capitalize(ticketInfo.name)} Ticket <#${ticketChannelId}> opened!`);
             }
             else if (message != null) {
                 message.reply(`Already existing channel in ${ticketInfo.name} category!`);
@@ -98,12 +103,12 @@ module.exports = {
         }
     },
 
-    close: async function(guild, ticketType, customer, interaction, message) {
+    close: async (guild, ticketType, customer, interaction, message) => {
         const ticketInfo = getTicketInfo(ticketType);
         if (ticketInfo !== undefined) {
             if (exists(guild, ticketInfo, customer)) {
                 try {
-                    const ticketChannel = guild.channels.cache.find(channel => channel.name === customer && channel.parentId === ticketInfo.category);
+                    const ticketChannel = getTicketChannel(guild, ticketInfo, customer);
                     const transcriptChannel = guild.channels.cache.find(channel => channel.id === ticketInfo.log);
                     const date = new Date();
                     const transcript = await createTranscript(ticketChannel, {
@@ -132,7 +137,7 @@ module.exports = {
                     };
                     transcriptChannel.send({ embeds: [embed], files: [transcript] });
                     if (interaction != null) {
-                        interaction.reply('🔐 Ticket will be closed in 5 seconds!');
+                        interaction.editReply('🔐 Ticket will be closed in 5 seconds!');
                     }
                     setTimeout(() => {
                         ticketChannel.delete().then(() => {
@@ -145,7 +150,7 @@ module.exports = {
                 catch (error) {
                     const display_message = 'There was a problem closing the ticket';
                     if (interaction != null) {
-                        interaction.reply(display_message);
+                        interaction.editReply(display_message);
                     }
                     else if (message != null) {
                         message.reply(display_message);
@@ -162,40 +167,51 @@ module.exports = {
         }
     },
 
-    alternateLock: function(guild, ticketType, customer, lock, interaction, message) {
+    alternateLock: async (guild, ticketType, customer, lock, interaction, message) => {
         // lock = true => lock ticket
         // lock = false => unlock ticket
         const ticketInfo = getTicketInfo(ticketType);
         if (ticketInfo !== undefined) {
             if (exists(guild, ticketInfo, customer)) {
                 try {
-                    // eslint-disable-next-line no-unused-vars
-                    const ticketChannel = guild.channels.cache.find(channel => channel.name === customer && channel.parentId === ticketInfo.category);
-                    // TODO: SEND_MESSAGES: false for customers in ticketChannel
-                    // test with cosolegend account
-                    const test_account = guild.members.cache.find(member => member.id === '584488107643240454');
-                    ticketChannel.permissionOverwrites.edit(test_account, {
-                        SEND_MESSAGES: !lock,
-                    }).then(async () => {
-                        await ticketChannel.messages.fetch({ after: 1, limit: 1 }).then(ticketMessages => {
-                            const embedTicketMessage = ticketMessages.first();
-                            const [embed, buttons] = createTicketEmbed(guild, ticketChannel, ticketInfo, lock);
-                            embedTicketMessage.edit({ embeds: [embed], components: [buttons] }).then(() => {
-                                const display_message = (lock ? '🔒' : '🔓') + ' Ticket ' + (lock ? 'locked' : 'unlocked') + '!';
-                                if (interaction != null) {
-                                    interaction.reply(display_message);
-                                }
-                                else if (message != null) {
-                                    message.reply(display_message);
-                                }
-                            });
+                    const ticketChannel = getTicketChannel(guild, ticketInfo, customer);
+                    let customerDiscord = guild.members.cache.find(member => member.id === customer);
+                    // not group, only one user
+                    if (customerDiscord !== undefined) {
+                        await ticketChannel.permissionOverwrites.edit(customerDiscord, {
+                            SEND_MESSAGES: !lock,
+                        });
+                    }
+                    // group
+                    else {
+                        const customerIds = (await notion.getUsersIdsByGroupId(customer)).UsersDiscordIds;
+                        for (const customerId of customerIds) {
+                            customerDiscord = guild.members.cache.find(member => member.id === customerId);
+                            if (customerDiscord !== undefined) {
+                                await ticketChannel.permissionOverwrites.edit(customerDiscord, {
+                                    SEND_MESSAGES: !lock,
+                                });
+                            }
+                        }
+                    }
+                    ticketChannel.messages.fetch({ after: 1, limit: 1 }).then(ticketMessages => {
+                        const embedTicketMessage = ticketMessages.first();
+                        const [embed, buttons] = createTicketEmbed(guild, ticketChannel, ticketInfo, lock);
+                        embedTicketMessage.edit({ embeds: [embed], components: [buttons] }).then(() => {
+                            const display_message = (lock ? '🔒' : '🔓') + ' Ticket ' + (lock ? 'locked' : 'unlocked') + '!';
+                            if (interaction != null) {
+                                interaction.editReply(display_message);
+                            }
+                            else if (message != null) {
+                                message.reply(display_message);
+                            }
                         });
                     });
                 }
                 catch (error) {
                     const display_message = 'There was a problem ' + (lock ? 'locking' : 'unlocking') + ' the ticket';
                     if (interaction != null) {
-                        interaction.reply(display_message);
+                        interaction.editReply(display_message);
                     }
                     else if (message != null) {
                         message.reply(display_message);
@@ -219,6 +235,7 @@ function getOpenInteractionList() {
     return config.tickets.filter(ticketInfo => ticketInfo.name !== 'invoice').map(ticketInfo => {
         return {
             name: ticketInfo.name,
+            customer: ticketInfo.customer,
             description: ticketInfo.description,
             emoji: ticketInfo.emoji,
             id: 'open_' + ticketInfo.name + '_ticket',
@@ -231,7 +248,11 @@ function getTicketInfo(ticketType) {
 }
 
 function exists(guild, ticketInfo, customer) {
-    return guild.channels.cache.some(channel => channel.name === customer && channel.parentId === ticketInfo.category);
+    return guild.channels.cache.some(channel => channel.parentId === ticketInfo.category && channel.name === customer);
+}
+
+function getTicketChannel(guild, ticketInfo, customer) {
+    return guild.channels.cache.find(channel => channel.parentId === ticketInfo.category && channel.name === customer);
 }
 
 function createTicketEmbed(guild, ticketChannel, ticketInfo, locked) {

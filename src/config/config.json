@@ -1,5 +1,4 @@
 {
-    "token": "BOT TOKEN",
     "prefix": "COMMANDS PREFIX",
     "guild": "GUILD ID",
     "client": "BOT ID",
@@ -11,7 +10,20 @@
     },
     "tickets": [
         {
+            "name": "information",
+            "customer": false,
+            "category": "INFORMATION CATEGORY ID",
+            "log": "INFORMATION LOG CHANNEL ID",
+            "description": "INFORMATION DESCRIPTION",
+            "emoji": "INFORMATION EMOJI",
+            "info": [
+                "information ticket",
+                "next line :)"
+            ]
+        },
+        {
             "name": "order",
+            "customer": false,
             "category": "ORDER CATEGORY ID",
             "log": "ORDER LOG CHANNEL ID",
             "description": "ORDER DESCRIPTION",
@@ -23,6 +35,7 @@
         },
         {
             "name": "support",
+            "customer": true,
             "category": "SUPPORT CATEGORY ID",
             "log": "SUPPORT LOG CHANNEL ID",
             "description": "SUPPORT DESCRIPTION",
@@ -34,6 +47,7 @@
         },
         {
             "name": "invoice",
+            "customer": true,
             "category": "INVOICE CATEGORY ID",
             "log": "INVOICE LOG CHANNEL ID",
             "description": "INVOICE DESCRIPTION",

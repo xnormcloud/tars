@@ -1,7 +1,9 @@
 const { Client, Collection } = require('discord.js');
 const fs = require('fs');
-const config = require('../config/config.json');
-const { initDiscordMessage } = require('../utils/ticket');
+const config = require('../../config.json');
+require('dotenv').config();
+const discordBotToken = process.env.DISCORD_BOT_TOKEN;
+const { initDiscordMessage } = require('../utils/ticket.js');
 
 const path = require('path');
 const dirname = path.resolve();
@@ -28,7 +30,7 @@ class ExtendedClient extends Client {
     }
 
     run() {
-        this.login(config.token).then(() => console.log('\x1b[36m%s\x1b[0m', '[login] login step succeed'));
+        this.login(discordBotToken).then(() => console.log('\x1b[36m%s\x1b[0m', '[login] login step succeed'));
         // TODO: fix execute ready.js from here
         this.once('ready', () => this.registerModules());
     }
@@ -69,7 +71,7 @@ class ExtendedClient extends Client {
         });
         // ticket discord message init
         await initDiscordMessage(guild).then(() =>
-            console.log('\x1b[32m%s\x1b[0m', '[ticket] discord message init succeed'),
+            console.log('\x1b[36m%s\x1b[0m', '[ticket] discord message init succeed'),
         );
         console.log('\x1b[36m%s\x1b[0m', '[modules] everything loaded successfully');
     }

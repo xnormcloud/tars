@@ -4,18 +4,20 @@
   "description": "discordbot for xnormcloud behaviour",
   "main": "src/app.js",
   "repository": "git@github.com:xnormnet/xnorm-cloud-bot.git",
-  "author": "legendnightt <alex@legend.sh>",
+  "author": "skuzow <alex@skuzow.net>",
   "license": "GPL-3.0",
+  "scripts": {
+    "bot": "node .",
+    "test": "nodemon ."
+  },
   "dependencies": {
+    "@notionhq/client": "^1.0.4",
     "discord-html-transcripts": "^2.5.8",
-    "discord.js": "^13.6.0"
+    "discord.js": "^13.8.1",
+    "dotenv": "^16.0.1"
   },
   "devDependencies": {
     "eslint": "^8.12.0",
     "nodemon": "^2.0.15"
-  },
-  "scripts": {
-    "bot": "node .",
-    "test": "nodemon ."
   }
 }
