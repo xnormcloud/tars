@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@notionhq/client": "^1.0.4",
+    "bcrypt": "^5.0.1",
     "discord-html-transcripts": "^2.5.8",
     "discord.js": "^13.8.1",
     "dotenv": "^16.0.1"
