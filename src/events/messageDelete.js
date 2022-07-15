@@ -4,6 +4,8 @@ module.exports = {
     name: 'messageDelete',
     once: false,
     run(logChannel, message) {
+        // prevents crashing if message content is empty
+        if (message.content === '') return;
         // log
         const avatar = message.author.displayAvatarURL({ size: 4096, dynamic: true });
         const embed = {
