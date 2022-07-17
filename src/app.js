@@ -1,4 +1,4 @@
-const { generateConfig } = require('./utils/config');
+const { generateConfig } = require('./systems/config.js');
 
 // generate config if not already generated
 generateConfig();
