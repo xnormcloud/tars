@@ -113,35 +113,53 @@ module.exports = {
         });
     },
 
+    isInsideDiscord: discordId => {
+        return guild.members.cache.some(member => member.id === discordId);
+    },
+
     open: async (ticketType, customer, interaction, message) => {
         const ticketInfo = getTicketInfo(ticketType);
         if (ticketInfo !== undefined) {
+            let group = false;
+            let valid = false;
+            const customerLen = customer.length;
+            // discord id
+            if (customerLen === 18) {
+                // not inside discord
+                if (!module.exports.isInsideDiscord(customer)) return 2;
+                valid = true;
+            }
+            // group id
+            else if (customerLen === 32) {
+                group = true;
+                valid = true;
+            }
+            // not valid id
+            if (!valid) return 1;
             const customerHash = hash.convert(customer);
             if (!exists(ticketInfo, customerHash)) {
                 try {
-                    guild.channels.create(customerHash).then(channel => {
-                        channel.setParent(ticketInfo.category).then(ticketChannel => {
+                    let created;
+                    await guild.channels.create(customerHash).then(async channel => {
+                        await channel.setParent(ticketInfo.category).then(async ticketChannel => {
                             const [embed, buttons] = createTicketEmbed(ticketChannel, ticketInfo, false);
-                            ticketChannel.send({ embeds: [embed], components: [buttons] }).then(async () => {
-                                let customerDiscord = guild.members.cache.find(member => member.id === customer);
-                                // not group, only one user
-                                if (customerDiscord !== undefined) {
-                                    await ticketChannel.permissionOverwrites.edit(customerDiscord, {
-                                        VIEW_CHANNEL: true,
-                                        SEND_MESSAGES: true,
-                                    });
-                                }
+                            await ticketChannel.send({ embeds: [embed], components: [buttons] }).then(async () => {
+                                let customerIds;
                                 // group
+                                if (group) {
+                                    customerIds = (await notion.getUsersIdsByGroupId(customer)).UsersDiscordIds;
+                                }
+                                // single user
                                 else {
-                                    const customerIds = (await notion.getUsersIdsByGroupId(customer)).UsersDiscordIds;
-                                    for (const customerId of customerIds) {
-                                        customerDiscord = guild.members.cache.find(member => member.id === customerId);
-                                        if (customerDiscord !== undefined) {
-                                            await ticketChannel.permissionOverwrites.edit(customerDiscord, {
-                                                VIEW_CHANNEL: true,
-                                                SEND_MESSAGES: true,
-                                            });
-                                        }
+                                    customerIds = [customer];
+                                }
+                                for (const customerId of customerIds) {
+                                    const customerDiscord = guild.members.cache.find(member => member.id === customerId);
+                                    if (customerDiscord !== undefined) {
+                                        await ticketChannel.permissionOverwrites.edit(customerDiscord, {
+                                            VIEW_CHANNEL: true,
+                                            SEND_MESSAGES: true,
+                                        });
                                     }
                                 }
                                 if (interaction != null) {
@@ -150,9 +168,13 @@ module.exports = {
                                 else if (message != null) {
                                     message.reply(`Ticket successfully opened in ${ticketInfo.name} category!`);
                                 }
+                                else {
+                                    created = 0;
+                                }
                             });
                         });
                     });
+                    return created;
                 }
                 catch (e) {
                     const display_message = 'There was a problem opening the ticket';
@@ -161,6 +183,9 @@ module.exports = {
                     }
                     else if (message != null) {
                         message.reply(display_message);
+                    }
+                    else {
+                        return -1;
                     }
                     console.error(e);
                 }
@@ -171,6 +196,9 @@ module.exports = {
             }
             else if (message != null) {
                 message.reply(`Already existing channel in ${ticketInfo.name} category!`);
+            }
+            else {
+                return 3;
             }
         }
         else if (message != null) {
