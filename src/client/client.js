@@ -3,7 +3,7 @@ const fs = require('fs');
 const config = require('../../config.json');
 require('dotenv').config();
 const discordBotToken = process.env.DISCORD_BOT_TOKEN;
-const { initDiscordMessage } = require('../utils/ticket.js');
+const ticket = require('../utils/ticket.js');
 
 const path = require('path');
 const dirname = path.resolve();
@@ -69,8 +69,12 @@ class ExtendedClient extends Client {
                 console.log('\x1b[34m%s\x1b[0m', `[events] client.on(${event.name}) loaded`);
             }
         });
+        // ticket guild init
+        ticket.initGuild(guild).then(() =>
+            console.log('\x1b[36m%s\x1b[0m', '[ticket] guild init succeed'),
+        );
         // ticket discord message init
-        await initDiscordMessage(guild).then(() =>
+        await ticket.initDiscordMessage(guild).then(() =>
             console.log('\x1b[36m%s\x1b[0m', '[ticket] discord message init succeed'),
         );
         console.log('\x1b[36m%s\x1b[0m', '[modules] everything loaded successfully');

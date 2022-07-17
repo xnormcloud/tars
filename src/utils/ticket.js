@@ -5,9 +5,15 @@ const notion = require('../database/notion.js');
 const hash = require('../utils/hash.js');
 const { capitalize } = require('../utils/string.js');
 
+let guild;
+
 module.exports = {
 
-    initDiscordMessage: async guild => {
+    initGuild: async guildEntry => {
+        guild = guildEntry;
+    },
+
+    initDiscordMessage: async () => {
         const ticketMessageChannel = guild.channels.cache.find(channel => channel.id === config.channels.ticket);
         ticketMessageChannel.messages.fetch({ after: 1, limit: 1 }).then(ticketMessages => {
             if (ticketMessages.size !== 0) return;
@@ -40,15 +46,15 @@ module.exports = {
 
     getOpenInteractionList,
 
-    open: async (guild, ticketType, customer, interaction, message) => {
+    open: async (ticketType, customer, interaction, message) => {
         const ticketInfo = getTicketInfo(ticketType);
         if (ticketInfo !== undefined) {
             const customerHash = hash.convert(customer);
-            if (!exists(guild, ticketInfo, customerHash)) {
+            if (!exists(ticketInfo, customerHash)) {
                 try {
                     guild.channels.create(customerHash).then(channel => {
                         channel.setParent(ticketInfo.category).then(ticketChannel => {
-                            const [embed, buttons] = createTicketEmbed(guild, ticketChannel, ticketInfo, false);
+                            const [embed, buttons] = createTicketEmbed(ticketChannel, ticketInfo, false);
                             ticketChannel.send({ embeds: [embed], components: [buttons] }).then(async () => {
                                 let customerDiscord = guild.members.cache.find(member => member.id === customer);
                                 // not group, only one user
@@ -93,7 +99,7 @@ module.exports = {
                 }
             }
             else if (interaction != null) {
-                const ticketChannelId = getTicketChannel(guild, ticketInfo, customerHash).id;
+                const ticketChannelId = getTicketChannel(ticketInfo, customerHash).id;
                 interaction.editReply(`You already have a ${capitalize(ticketInfo.name)} Ticket <#${ticketChannelId}> opened!`);
             }
             else if (message != null) {
@@ -105,12 +111,12 @@ module.exports = {
         }
     },
 
-    close: async (guild, ticketType, customerHash, interaction, message) => {
+    close: async (ticketType, customerHash, interaction, message) => {
         const ticketInfo = getTicketInfo(ticketType);
         if (ticketInfo !== undefined) {
-            if (exists(guild, ticketInfo, customerHash)) {
+            if (exists(ticketInfo, customerHash)) {
                 try {
-                    const ticketChannel = getTicketChannel(guild, ticketInfo, customerHash);
+                    const ticketChannel = getTicketChannel(ticketInfo, customerHash);
                     const transcriptChannel = guild.channels.cache.find(channel => channel.id === ticketInfo.log);
                     const date = new Date();
                     const transcript = await createTranscript(ticketChannel, {
@@ -169,14 +175,14 @@ module.exports = {
         }
     },
 
-    alternateLock: async (guild, ticketType, customerHash, lock, interaction, message) => {
+    alternateLock: async (ticketType, customerHash, lock, interaction, message) => {
         // lock = true => lock ticket
         // lock = false => unlock ticket
         const ticketInfo = getTicketInfo(ticketType);
         if (ticketInfo !== undefined) {
-            if (exists(guild, ticketInfo, customerHash)) {
+            if (exists(ticketInfo, customerHash)) {
                 try {
-                    const ticketChannel = getTicketChannel(guild, ticketInfo, customerHash);
+                    const ticketChannel = getTicketChannel(ticketInfo, customerHash);
                     const customerIds = ticketChannel.permissionOverwrites.cache.filter(member => member.type === 'member').map(member => {
                         return member.id;
                     });
@@ -190,7 +196,7 @@ module.exports = {
                     }
                     ticketChannel.messages.fetch({ after: 1, limit: 1 }).then(ticketMessages => {
                         const embedTicketMessage = ticketMessages.first();
-                        const [embed, buttons] = createTicketEmbed(guild, ticketChannel, ticketInfo, lock);
+                        const [embed, buttons] = createTicketEmbed(ticketChannel, ticketInfo, lock);
                         embedTicketMessage.edit({ embeds: [embed], components: [buttons] }).then(() => {
                             const display_message = (lock ? '🔒' : '🔓') + ' Ticket ' + (lock ? 'locked' : 'unlocked') + '!';
                             if (interaction != null) {
@@ -241,15 +247,15 @@ function getTicketInfo(ticketType) {
     return config.tickets.find(ticketInfo => ticketInfo.name === ticketType);
 }
 
-function exists(guild, ticketInfo, customerHash) {
+function exists(ticketInfo, customerHash) {
     return guild.channels.cache.some(channel => channel.parentId === ticketInfo.category && channel.name === customerHash);
 }
 
-function getTicketChannel(guild, ticketInfo, customerHash) {
+function getTicketChannel(ticketInfo, customerHash) {
     return guild.channels.cache.find(channel => channel.parentId === ticketInfo.category && channel.name === customerHash);
 }
 
-function createTicketEmbed(guild, ticketChannel, ticketInfo, locked) {
+function createTicketEmbed(ticketChannel, ticketInfo, locked) {
     const bot = guild.members.cache.find(member => member.id === config.client);
     const embed = {
         color: locked ? config.colors.red : config.colors.blue,

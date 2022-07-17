@@ -13,16 +13,16 @@ module.exports = {
     async run(guild, message, args) {
         switch (args[0]) {
         case 'open':
-            await ticket.open(guild, args[1], args[2], null, message);
+            await ticket.open(args[1], args[2], null, message);
             break;
         case 'close':
-            await ticket.close(guild, args[1], args[2], null, message);
+            await ticket.close(args[1], args[2], null, message);
             break;
         case 'lock':
-            await ticket.alternateLock(guild, args[1], args[2], true, null, message);
+            await ticket.alternateLock(args[1], args[2], true, null, message);
             break;
         case 'unlock':
-            await ticket.alternateLock(guild, args[1], args[2], false, null, message);
+            await ticket.alternateLock(args[1], args[2], false, null, message);
             break;
         default:
             message.reply('Unknown subcommand provided');

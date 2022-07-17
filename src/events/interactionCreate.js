@@ -42,7 +42,7 @@ module.exports = {
         */
         // tickets
         if (!interaction.isButton()) return;
-        const { guild, customId, channel, member } = interaction;
+        const { customId, channel, member } = interaction;
         const openTicketInteractionList = ticket.getOpenInteractionList();
         if (openTicketInteractionList.some(openTicketInteraction => openTicketInteraction.id === customId)) {
             await interaction.deferReply({ ephemeral: true });
@@ -53,11 +53,11 @@ module.exports = {
             const groups = await notion.getGroupsByUserId(member.id);
             // open ticket for not customer
             if (groups.length === 0) {
-                await ticket.open(guild, ticketInfo.name, member.id, interaction, null);
+                await ticket.open(ticketInfo.name, member.id, interaction, null);
             }
             // open ticket for customer
             else {
-                await ticket.open(guild, ticketInfo.name, groups[0].id, interaction, null);
+                await ticket.open(ticketInfo.name, groups[0].id, interaction, null);
             }
         }
         else if (isAdmin(member, interaction)) {
@@ -66,13 +66,13 @@ module.exports = {
             const channelName = channel.name;
             switch (customId) {
             case 'save_close_ticket':
-                await ticket.close(guild, ticketInfoName, channelName, interaction, null);
+                await ticket.close(ticketInfoName, channelName, interaction, null);
                 break;
             case 'lock_ticket':
-                await ticket.alternateLock(guild, ticketInfoName, channelName, true, interaction, null);
+                await ticket.alternateLock(ticketInfoName, channelName, true, interaction, null);
                 break;
             case 'unlock_ticket':
-                await ticket.alternateLock(guild, ticketInfoName, channelName, false, interaction, null);
+                await ticket.alternateLock(ticketInfoName, channelName, false, interaction, null);
                 break;
             }
         }
