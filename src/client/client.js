@@ -3,7 +3,7 @@ const fs = require('fs');
 const config = require('../../config.json');
 require('dotenv').config();
 const discordBotToken = process.env.DISCORD_BOT_TOKEN;
-const ticket = require('../utils/ticket.js');
+const ticket = require('../systems/ticket.js');
 
 const path = require('path');
 const dirname = path.resolve();

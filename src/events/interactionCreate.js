@@ -1,6 +1,6 @@
 const config = require('../../config.json');
 const notion = require('../database/notion.js');
-const ticket = require('../utils/ticket.js');
+const ticket = require('../systems/ticket.js');
 const { capitalize } = require('../utils/string');
 
 const isValidUser = async (member, ticketInfoCustomer) => {

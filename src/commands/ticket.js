@@ -1,4 +1,4 @@
-const ticket = require('../utils/ticket.js');
+const ticket = require('../systems/ticket.js');
 
 module.exports = {
     name: 'ticket',

@@ -2,8 +2,8 @@ const { MessageActionRow, MessageButton } = require('discord.js');
 const { createTranscript } = require('discord-html-transcripts');
 const config = require('../../config.json');
 const notion = require('../database/notion.js');
-const hash = require('./hash.js');
-const { capitalize } = require('./string.js');
+const hash = require('../utils/hash.js');
+const { capitalize } = require('../utils/string.js');
 
 let guild;
 
