@@ -27,7 +27,7 @@ module.exports = {
     },
 
     createUser: async (discordId, discordUsername) => {
-        if (await findById(discordId) !== -1) {
+        if (await module.exports.findById(discordId) !== -1) {
             return 400;
         }
         await notion.pages.create({
@@ -56,7 +56,24 @@ module.exports = {
         return { id: discordId, discordId: discordId, username: discordUsername };
     },
 
-    findById,
+    findById: async discordId => {
+        const response = await notion.databases.query({
+            database_id: notionUsersDatabaseId,
+            filter:{
+                'property': 'DiscordId',
+                'rich_text': {
+                    'equals': discordId,
+                },
+            },
+        });
+        if (response.results.length === 1) {
+            return {
+                id: discordId,
+                username: response.results[0].properties.DiscordUsername.title[0].plain_text,
+            };
+        }
+        return -1;
+    },
 
     getUsersIdsByGroupId: async groupId => {
         const usersInGroupResponse = await notion.databases.query({
@@ -120,22 +137,3 @@ module.exports = {
     },
 
 };
-
-async function findById(discordId) {
-    const response = await notion.databases.query({
-        database_id: notionUsersDatabaseId,
-        filter:{
-            'property': 'DiscordId',
-            'rich_text': {
-                'equals': discordId,
-            },
-        },
-    });
-    if (response.results.length === 1) {
-        return {
-            id: discordId,
-            username: response.results[0].properties.DiscordUsername.title[0].plain_text,
-        };
-    }
-    return -1;
-}

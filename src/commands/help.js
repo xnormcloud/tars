@@ -3,7 +3,7 @@ const config = require('../../config.json');
 module.exports = {
     name: 'help',
     description: 'command help',
-    run(message, commands) {
+    run: (message, commands) => {
         const embed = {
             color: config.colors.blue,
             thumbnail: { url: message.guild.members.cache.get(config.client).displayAvatarURL({ size: 4096, dynamic: true }) },

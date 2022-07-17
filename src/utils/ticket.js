@@ -2,10 +2,66 @@ const { MessageActionRow, MessageButton } = require('discord.js');
 const { createTranscript } = require('discord-html-transcripts');
 const config = require('../../config.json');
 const notion = require('../database/notion.js');
-const hash = require('../utils/hash.js');
-const { capitalize } = require('../utils/string.js');
+const hash = require('./hash.js');
+const { capitalize } = require('./string.js');
 
 let guild;
+
+const getTicketInfo = ticketType => {
+    return config.tickets.find(ticketInfo => ticketInfo.name === ticketType);
+};
+
+const exists = (ticketInfo, customerHash) => {
+    return guild.channels.cache.some(channel => channel.parentId === ticketInfo.category && channel.name === customerHash);
+};
+
+const getTicketChannel = (ticketInfo, customerHash) => {
+    return guild.channels.cache.find(channel => channel.parentId === ticketInfo.category && channel.name === customerHash);
+};
+
+const createTicketEmbed = (ticketChannel, ticketInfo, locked) => {
+    const bot = guild.members.cache.find(member => member.id === config.client);
+    const embed = {
+        color: locked ? config.colors.red : config.colors.blue,
+        author: { name: `Welcome to ${capitalize(ticketInfo.name)} Ticket` },
+        description: 'Please be patient, we will answer as soon as possible.',
+        thumbnail: { url: bot.displayAvatarURL({ size: 4096, dynamic: true }) },
+        fields: [
+            { name: 'Important information', value: ticketInfo.info.join('\n') },
+            { name: 'Status', value: locked ? '🔒 Locked' : '🔓 Unlocked' },
+        ],
+        timestamp: new Date(),
+        footer: { text: `ID: ${ticketChannel.id}` },
+    };
+    const buttons = new MessageActionRow()
+        .addComponents(
+            new MessageButton()
+                .setCustomId('save_close_ticket')
+                .setLabel('💾 Save & Close')
+                .setStyle('PRIMARY'),
+            new MessageButton()
+                .setURL('https://xnorm.cloud')
+                .setLabel('🌐 Website')
+                .setStyle('LINK'),
+        );
+    if (locked) {
+        buttons.addComponents(
+            new MessageButton()
+                .setCustomId('unlock_ticket')
+                .setLabel('🔓 Unlock')
+                .setStyle('SUCCESS'),
+        );
+    }
+    else {
+        buttons.addComponents(
+            new MessageButton()
+                .setCustomId('lock_ticket')
+                .setLabel('🔒 Lock')
+                .setStyle('DANGER'),
+        );
+    }
+    return [embed, buttons];
+};
 
 module.exports = {
 
@@ -26,7 +82,7 @@ module.exports = {
             };
             const buttons = new MessageActionRow();
             const fields = [];
-            getOpenInteractionList().map(openTicketInteraction => {
+            module.exports.getOpenInteractionList().map(openTicketInteraction => {
                 const openTicketInteractionName = capitalize(openTicketInteraction.name);
                 fields.push({
                     name: openTicketInteractionName,
@@ -44,7 +100,18 @@ module.exports = {
         });
     },
 
-    getOpenInteractionList,
+    getOpenInteractionList: () => {
+        // no button for invoice tickets, those are auto generated
+        return config.tickets.filter(ticketInfo => ticketInfo.name !== 'invoice').map(ticketInfo => {
+            return {
+                name: ticketInfo.name,
+                customer: ticketInfo.customer,
+                description: ticketInfo.description,
+                emoji: ticketInfo.emoji,
+                id: 'open_' + ticketInfo.name + '_ticket',
+            };
+        });
+    },
 
     open: async (ticketType, customer, interaction, message) => {
         const ticketInfo = getTicketInfo(ticketType);
@@ -229,72 +296,3 @@ module.exports = {
     },
 
 };
-
-function getOpenInteractionList() {
-    // no button for invoice tickets, those are auto generated
-    return config.tickets.filter(ticketInfo => ticketInfo.name !== 'invoice').map(ticketInfo => {
-        return {
-            name: ticketInfo.name,
-            customer: ticketInfo.customer,
-            description: ticketInfo.description,
-            emoji: ticketInfo.emoji,
-            id: 'open_' + ticketInfo.name + '_ticket',
-        };
-    });
-}
-
-function getTicketInfo(ticketType) {
-    return config.tickets.find(ticketInfo => ticketInfo.name === ticketType);
-}
-
-function exists(ticketInfo, customerHash) {
-    return guild.channels.cache.some(channel => channel.parentId === ticketInfo.category && channel.name === customerHash);
-}
-
-function getTicketChannel(ticketInfo, customerHash) {
-    return guild.channels.cache.find(channel => channel.parentId === ticketInfo.category && channel.name === customerHash);
-}
-
-function createTicketEmbed(ticketChannel, ticketInfo, locked) {
-    const bot = guild.members.cache.find(member => member.id === config.client);
-    const embed = {
-        color: locked ? config.colors.red : config.colors.blue,
-        author: { name: `Welcome to ${capitalize(ticketInfo.name)} Ticket` },
-        description: 'Please be patient, we will answer as soon as possible.',
-        thumbnail: { url: bot.displayAvatarURL({ size: 4096, dynamic: true }) },
-        fields: [
-            { name: 'Important information', value: ticketInfo.info.join('\n') },
-            { name: 'Status', value: locked ? '🔒 Locked' : '🔓 Unlocked' },
-        ],
-        timestamp: new Date(),
-        footer: { text: `ID: ${ticketChannel.id}` },
-    };
-    const buttons = new MessageActionRow()
-        .addComponents(
-            new MessageButton()
-                .setCustomId('save_close_ticket')
-                .setLabel('💾 Save & Close')
-                .setStyle('PRIMARY'),
-            new MessageButton()
-                .setURL('https://xnorm.cloud')
-                .setLabel('🌐 Website')
-                .setStyle('LINK'),
-        );
-    if (locked) {
-        buttons.addComponents(
-            new MessageButton()
-                .setCustomId('unlock_ticket')
-                .setLabel('🔓 Unlock')
-                .setStyle('SUCCESS'),
-        );
-    }
-    else {
-        buttons.addComponents(
-            new MessageButton()
-                .setCustomId('lock_ticket')
-                .setLabel('🔒 Lock')
-                .setStyle('DANGER'),
-        );
-    }
-    return [embed, buttons];
-}

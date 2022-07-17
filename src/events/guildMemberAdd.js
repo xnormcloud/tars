@@ -3,10 +3,10 @@ const config = require('../../config.json');
 module.exports = {
     name: 'guildMemberAdd',
     once: false,
-    run(logChannel, member) {
+    run: (logChannel, member) => {
         // join
-        const joinchannel = member.guild.channels.cache.get(config.channels.join);
-        joinchannel.send(`👋🏻 Welcome to the server <@${member.id}>!`);
+        const joinChannel = member.guild.channels.cache.get(config.channels.join);
+        joinChannel.send(`👋🏻 Welcome to the server <@${member.id}>!`);
         // log & gets account creation date
         const date = new Date(member.user.createdTimestamp).toString();
         const avatar = member.user.displayAvatarURL({ size: 4096, dynamic: true });

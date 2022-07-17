@@ -1,9 +1,18 @@
 const config = require('../../config.json');
 
+const runCommand = (command, commands, guild, message, args) => {
+    if (command.name === 'help') {
+        command.run(message, commands);
+    }
+    else {
+        command.run(guild, message, args);
+    }
+};
+
 module.exports = {
     name: 'messageCreate',
     once: false,
-    run(guild, commands, message) {
+    run: (guild, commands, message) => {
         // not a command
         if (!message.content.startsWith(config.prefix)) return;
         // command ->
@@ -31,12 +40,3 @@ module.exports = {
         }
     },
 };
-
-function runCommand(command, commands, guild, message, args) {
-    if (command.name === 'help') {
-        command.run(message, commands);
-    }
-    else {
-        command.run(guild, message, args);
-    }
-}

@@ -4,14 +4,12 @@ const hashSalt = process.env.HASH_SALT;
 
 module.exports = {
 
-    convert,
+    convert: message => {
+        return bcrypt.hashSync(message, hashSalt).replace(/[^a-z\d]/g, '');
+    },
 
     same: (hashMessage, message) => {
-        return hashMessage === convert(message);
+        return hashMessage === module.exports.convert(message);
     },
 
 };
-
-function convert(message) {
-    return bcrypt.hashSync(message, hashSalt).replace(/[^a-z\d]/g, '');
-}
