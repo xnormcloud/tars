@@ -13,7 +13,7 @@ module.exports = {
     userTypeById: async discordId => {
         const response = await notion.databases.query({
             database_id: notionUsersDatabaseId,
-            filter:{
+            filter: {
                 'property': 'DiscordId',
                 'rich_text': {
                     'equals': discordId,
@@ -59,7 +59,7 @@ module.exports = {
     findById: async discordId => {
         const response = await notion.databases.query({
             database_id: notionUsersDatabaseId,
-            filter:{
+            filter: {
                 'property': 'DiscordId',
                 'rich_text': {
                     'equals': discordId,
@@ -78,7 +78,7 @@ module.exports = {
     getUsersIdsByGroupId: async groupId => {
         const usersInGroupResponse = await notion.databases.query({
             database_id: notionGroupsDatabaseId,
-            filter:{
+            filter: {
                 'property': 'GroupId',
                 'rich_text': {
                     'equals': groupId,
@@ -109,7 +109,7 @@ module.exports = {
     getGroupsByUserId: async discordId => {
         const groupsInUser = await notion.databases.query({
             database_id: notionUsersDatabaseId,
-            filter:{
+            filter: {
                 'property': 'DiscordId',
                 'rich_text': {
                     'equals': discordId,
