@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const request = require('../utils/request');
 const ticket = require('../systems/ticket.js');
 
 const response = {
@@ -8,12 +9,12 @@ const response = {
 
 const processRequest = async (type, req, res) => {
     const cloneResponse = { ...response };
-    // if req.body empty
-    if (Object.keys(req.body).length === 0) {
-        cloneResponse.code = 1;
+    const body = req.body;
+    if (request.isValidRequest(body, 'userId')) {
+        await ticket.open(type, body.userId, cloneResponse, null, null);
     }
     else {
-        await ticket.open(type, req.body.userId, cloneResponse, null, null);
+        cloneResponse.code = 400;
     }
     res.send(cloneResponse);
 };
