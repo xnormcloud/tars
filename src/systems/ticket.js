@@ -128,7 +128,7 @@ module.exports = {
                 // not inside discord
                 if (!module.exports.isInsideDiscord(customer) && response !== null) {
                     response.code = 2;
-                    return response;
+                    return;
                 }
                 valid = true;
             }
@@ -140,7 +140,7 @@ module.exports = {
             // not valid id
             if (!valid && response !== null) {
                 response.code = 1;
-                return response;
+                return;
             }
             const customerHash = hash.convert(customer);
             if (!exists(ticketInfo, customerHash)) {
@@ -180,14 +180,10 @@ module.exports = {
                             });
                         });
                     });
-                    if (response != null) {
-                        return response;
-                    }
                 }
                 catch (e) {
                     if (response != null) {
                         response.code = -1;
-                        return response;
                     }
                     else {
                         const display_message = 'There was a problem opening the ticket';
@@ -206,7 +202,6 @@ module.exports = {
                 if (response != null) {
                     response.code = 3;
                     response.channel_link = `https://discord.com/channels/${guild.id}/${ticketChannelId}`;
-                    return response;
                 }
                 else if (interaction != null) {
                     interaction.editReply(`You already have a ${capitalize(ticketInfo.name)} Ticket <#${ticketChannelId}> opened!`);
