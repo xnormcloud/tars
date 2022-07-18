@@ -117,7 +117,7 @@ module.exports = {
         return guild.members.cache.some(member => member.id === discordId);
     },
 
-    open: async (ticketType, customer, interaction, message) => {
+    open: async (ticketType, customer, response, interaction, message) => {
         const ticketInfo = getTicketInfo(ticketType);
         if (ticketInfo !== undefined) {
             let group = false;
@@ -126,7 +126,10 @@ module.exports = {
             // discord id
             if (customerLen === 18) {
                 // not inside discord
-                if (!module.exports.isInsideDiscord(customer)) return 2;
+                if (!module.exports.isInsideDiscord(customer) && response !== null) {
+                    response.code = 2;
+                    return response;
+                }
                 valid = true;
             }
             // group id
@@ -135,11 +138,13 @@ module.exports = {
                 valid = true;
             }
             // not valid id
-            if (!valid) return 1;
+            if (!valid && response !== null) {
+                response.code = 1;
+                return response;
+            }
             const customerHash = hash.convert(customer);
             if (!exists(ticketInfo, customerHash)) {
                 try {
-                    let created;
                     await guild.channels.create(customerHash).then(async channel => {
                         await channel.setParent(ticketInfo.category).then(async ticketChannel => {
                             const [embed, buttons] = createTicketEmbed(ticketChannel, ticketInfo, false);
@@ -162,43 +167,53 @@ module.exports = {
                                         });
                                     }
                                 }
+                                if (response != null) {
+                                    response.code = 0;
+                                    response.channel_link = `https://discord.com/channels/${guild.id}/${ticketChannel.id}`;
+                                }
                                 if (interaction != null) {
                                     interaction.editReply(`${capitalize(ticketInfo.name)} Ticket <#${ticketChannel.id}> successfully opened!`);
                                 }
                                 else if (message != null) {
                                     message.reply(`Ticket successfully opened in ${ticketInfo.name} category!`);
                                 }
-                                else {
-                                    created = 0;
-                                }
                             });
                         });
                     });
-                    return created;
+                    if (response != null) {
+                        return response;
+                    }
                 }
                 catch (e) {
-                    const display_message = 'There was a problem opening the ticket';
-                    if (interaction != null) {
-                        interaction.editReply(display_message);
-                    }
-                    else if (message != null) {
-                        message.reply(display_message);
+                    if (response != null) {
+                        response.code = -1;
+                        return response;
                     }
                     else {
-                        return -1;
+                        const display_message = 'There was a problem opening the ticket';
+                        if (interaction != null) {
+                            interaction.editReply(display_message);
+                        }
+                        else if (message != null) {
+                            message.reply(display_message);
+                        }
                     }
                     console.error(e);
                 }
             }
-            else if (interaction != null) {
-                const ticketChannelId = getTicketChannel(ticketInfo, customerHash).id;
-                interaction.editReply(`You already have a ${capitalize(ticketInfo.name)} Ticket <#${ticketChannelId}> opened!`);
-            }
-            else if (message != null) {
-                message.reply(`Already existing channel in ${ticketInfo.name} category!`);
-            }
             else {
-                return 3;
+                const ticketChannelId = getTicketChannel(ticketInfo, customerHash).id;
+                if (response != null) {
+                    response.code = 3;
+                    response.channel_link = `https://discord.com/channels/${guild.id}/${ticketChannelId}`;
+                    return response;
+                }
+                else if (interaction != null) {
+                    interaction.editReply(`You already have a ${capitalize(ticketInfo.name)} Ticket <#${ticketChannelId}> opened!`);
+                }
+                else if (message != null) {
+                    message.reply(`Already existing channel <#${ticketChannelId}> in ${ticketInfo.name} category!`);
+                }
             }
         }
         else if (message != null) {

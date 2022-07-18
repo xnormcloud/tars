@@ -70,11 +70,11 @@ module.exports = {
             const groups = await notion.getGroupsByUserId(member.id);
             // open ticket for not customer
             if (groups.length === 0) {
-                await ticket.open(ticketInfo.name, member.id, interaction, null);
+                await ticket.open(ticketInfo.name, member.id, null, interaction, null);
             }
             // open ticket for customer
             else {
-                await ticket.open(ticketInfo.name, groups[0].id, interaction, null);
+                await ticket.open(ticketInfo.name, groups[0].id, null, interaction, null);
             }
         }
         // inside ticket buttons

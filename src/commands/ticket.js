@@ -11,7 +11,7 @@ module.exports = {
     run: async (guild, message, args) => {
         switch (args[0]) {
         case 'open':
-            await ticket.open(args[1], args[2], null, message);
+            await ticket.open(args[1], args[2], null, null, message);
             break;
         case 'close':
             await ticket.close(args[1], args[2], null, message);
