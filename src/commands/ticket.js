@@ -1,6 +1,4 @@
-// eslint-disable-next-line no-unused-vars
-const config = require('../../config.json');
-const ticket = require('../utils/ticket.js');
+const ticket = require('../systems/ticket.js');
 
 module.exports = {
     name: 'ticket',
@@ -10,19 +8,19 @@ module.exports = {
         { name: 'open', description: 'opens new ticket', parameters: ['type', 'customerid'] },
         { name: 'close', description: 'closes opened ticket', parameters: ['type', 'customerid'] },
     ],
-    async run(guild, message, args) {
+    run: async (guild, message, args) => {
         switch (args[0]) {
         case 'open':
-            await ticket.open(guild, args[1], args[2], null, message);
+            await ticket.open(args[1], args[2], null, null, message);
             break;
         case 'close':
-            await ticket.close(guild, args[1], args[2], null, message);
+            await ticket.close(args[1], args[2], null, message);
             break;
         case 'lock':
-            await ticket.alternateLock(guild, args[1], args[2], true, null, message);
+            await ticket.alternateLock(args[1], args[2], true, null, message);
             break;
         case 'unlock':
-            await ticket.alternateLock(guild, args[1], args[2], false, null, message);
+            await ticket.alternateLock(args[1], args[2], false, null, message);
             break;
         default:
             message.reply('Unknown subcommand provided');

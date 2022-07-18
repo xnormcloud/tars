@@ -5,7 +5,7 @@ const config = require('../../config.json');
 module.exports = {
     name: 'ready',
     once: true,
-    run(client) {
+    run: client => {
         /* slash commands register
         // rest stuff
         const rest = new REST({

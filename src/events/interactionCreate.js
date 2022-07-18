@@ -1,12 +1,28 @@
 const config = require('../../config.json');
 const notion = require('../database/notion.js');
-const ticket = require('../utils/ticket.js');
+const ticket = require('../systems/ticket.js');
 const { capitalize } = require('../utils/string');
+
+const isValidUser = async (member, ticketInfoCustomer) => {
+    if (ticketInfoCustomer) return await notion.userTypeById(member.id);
+    return true;
+};
+
+const isAdmin = (member, interaction) => {
+    if (!member.permissions.has('ADMINISTRATOR')) {
+        interaction.reply({
+            content: 'You don\'t have permission to use this button.',
+            ephemeral: true,
+        });
+        return false;
+    }
+    return true;
+};
 
 module.exports = {
     name: 'interactionCreate',
     once: false,
-    async run(logChannel, interaction) {
+    run: async (logChannel, interaction) => {
         /* slash commands
         // interaction commands
         if (interaction.isCommand()) {
@@ -42,8 +58,9 @@ module.exports = {
         */
         // tickets
         if (!interaction.isButton()) return;
-        const { guild, customId, channel, member } = interaction;
+        const { customId, channel, member } = interaction;
         const openTicketInteractionList = ticket.getOpenInteractionList();
+        // open ticket from discord
         if (openTicketInteractionList.some(openTicketInteraction => openTicketInteraction.id === customId)) {
             await interaction.deferReply({ ephemeral: true });
             const ticketInfo = openTicketInteractionList.find(openTicketInteraction => openTicketInteraction.id === customId);
@@ -53,44 +70,29 @@ module.exports = {
             const groups = await notion.getGroupsByUserId(member.id);
             // open ticket for not customer
             if (groups.length === 0) {
-                await ticket.open(guild, ticketInfo.name, member.id, interaction, null);
+                await ticket.open(ticketInfo.name, member.id, null, interaction, null);
             }
             // open ticket for customer
             else {
-                await ticket.open(guild, ticketInfo.name, groups[0].id, interaction, null);
+                await ticket.open(ticketInfo.name, groups[0].id, null, interaction, null);
             }
         }
+        // inside ticket buttons
         else if (isAdmin(member, interaction)) {
             await interaction.deferReply();
             const ticketInfoName = config.tickets.find(ticketSearch => ticketSearch.category === channel.parent.id).name;
             const channelName = channel.name;
             switch (customId) {
             case 'save_close_ticket':
-                await ticket.close(guild, ticketInfoName, channelName, interaction, null);
+                await ticket.close(ticketInfoName, channelName, interaction, null);
                 break;
             case 'lock_ticket':
-                await ticket.alternateLock(guild, ticketInfoName, channelName, true, interaction, null);
+                await ticket.alternateLock(ticketInfoName, channelName, true, interaction, null);
                 break;
             case 'unlock_ticket':
-                await ticket.alternateLock(guild, ticketInfoName, channelName, false, interaction, null);
+                await ticket.alternateLock(ticketInfoName, channelName, false, interaction, null);
                 break;
             }
         }
     },
 };
-
-async function isValidUser(member, ticketInfoCustomer) {
-    if (ticketInfoCustomer) return await notion.userTypeById(member.id);
-    return true;
-}
-
-function isAdmin(member, interaction) {
-    if (!member.permissions.has('ADMINISTRATOR')) {
-        interaction.reply({
-            content: 'You don\'t have permission to use this button.',
-            ephemeral: true,
-        });
-        return false;
-    }
-    return true;
-}

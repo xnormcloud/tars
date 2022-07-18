@@ -5,9 +5,71 @@ const notion = require('../database/notion.js');
 const hash = require('../utils/hash.js');
 const { capitalize } = require('../utils/string.js');
 
+let guild;
+
+const getTicketInfo = ticketType => {
+    return config.tickets.find(ticketInfo => ticketInfo.name === ticketType);
+};
+
+const exists = (ticketInfo, customerHash) => {
+    return guild.channels.cache.some(channel => channel.parentId === ticketInfo.category && channel.name === customerHash);
+};
+
+const getTicketChannel = (ticketInfo, customerHash) => {
+    return guild.channels.cache.find(channel => channel.parentId === ticketInfo.category && channel.name === customerHash);
+};
+
+const createTicketEmbed = (ticketChannel, ticketInfo, locked) => {
+    const bot = guild.members.cache.find(member => member.id === config.client);
+    const embed = {
+        color: locked ? config.colors.red : config.colors.blue,
+        author: { name: `Welcome to ${capitalize(ticketInfo.name)} Ticket` },
+        description: 'Please be patient, we will answer as soon as possible.',
+        thumbnail: { url: bot.displayAvatarURL({ size: 4096, dynamic: true }) },
+        fields: [
+            { name: 'Important information', value: ticketInfo.info.join('\n') },
+            { name: 'Status', value: locked ? '🔒 Locked' : '🔓 Unlocked' },
+        ],
+        timestamp: new Date(),
+        footer: { text: `ID: ${ticketChannel.id}` },
+    };
+    const buttons = new MessageActionRow()
+        .addComponents(
+            new MessageButton()
+                .setCustomId('save_close_ticket')
+                .setLabel('💾 Save & Close')
+                .setStyle('PRIMARY'),
+            new MessageButton()
+                .setURL('https://xnorm.cloud')
+                .setLabel('🌐 Website')
+                .setStyle('LINK'),
+        );
+    if (locked) {
+        buttons.addComponents(
+            new MessageButton()
+                .setCustomId('unlock_ticket')
+                .setLabel('🔓 Unlock')
+                .setStyle('SUCCESS'),
+        );
+    }
+    else {
+        buttons.addComponents(
+            new MessageButton()
+                .setCustomId('lock_ticket')
+                .setLabel('🔒 Lock')
+                .setStyle('DANGER'),
+        );
+    }
+    return [embed, buttons];
+};
+
 module.exports = {
 
-    initDiscordMessage: async guild => {
+    initGuild: async guildEntry => {
+        guild = guildEntry;
+    },
+
+    initDiscordMessage: async () => {
         const ticketMessageChannel = guild.channels.cache.find(channel => channel.id === config.channels.ticket);
         ticketMessageChannel.messages.fetch({ after: 1, limit: 1 }).then(ticketMessages => {
             if (ticketMessages.size !== 0) return;
@@ -20,7 +82,7 @@ module.exports = {
             };
             const buttons = new MessageActionRow();
             const fields = [];
-            getOpenInteractionList().map(openTicketInteraction => {
+            module.exports.getOpenInteractionList().map(openTicketInteraction => {
                 const openTicketInteractionName = capitalize(openTicketInteraction.name);
                 fields.push({
                     name: openTicketInteractionName,
@@ -38,38 +100,76 @@ module.exports = {
         });
     },
 
-    getOpenInteractionList,
+    getOpenInteractionList: () => {
+        // no button for invoice tickets, those are auto generated
+        return config.tickets.filter(ticketInfo => ticketInfo.name !== 'invoice').map(ticketInfo => {
+            return {
+                name: ticketInfo.name,
+                customer: ticketInfo.customer,
+                description: ticketInfo.description,
+                emoji: ticketInfo.emoji,
+                id: 'open_' + ticketInfo.name + '_ticket',
+            };
+        });
+    },
 
-    open: async (guild, ticketType, customer, interaction, message) => {
+    isInsideDiscord: discordId => {
+        return guild.members.cache.some(member => member.id === discordId);
+    },
+
+    open: async (ticketType, customer, response, interaction, message) => {
         const ticketInfo = getTicketInfo(ticketType);
         if (ticketInfo !== undefined) {
+            let group = false;
+            let valid = false;
+            const customerLen = customer.length;
+            // discord id
+            if (customerLen === 18) {
+                // not inside discord
+                if (!module.exports.isInsideDiscord(customer) && response !== null) {
+                    response.code = 2;
+                    return;
+                }
+                valid = true;
+            }
+            // group id
+            else if (customerLen === 32) {
+                group = true;
+                valid = true;
+            }
+            // not valid id
+            if (!valid && response !== null) {
+                response.code = 1;
+                return;
+            }
             const customerHash = hash.convert(customer);
-            if (!exists(guild, ticketInfo, customerHash)) {
+            if (!exists(ticketInfo, customerHash)) {
                 try {
-                    guild.channels.create(customerHash).then(channel => {
-                        channel.setParent(ticketInfo.category).then(ticketChannel => {
-                            const [embed, buttons] = createTicketEmbed(guild, ticketChannel, ticketInfo, false);
-                            ticketChannel.send({ embeds: [embed], components: [buttons] }).then(async () => {
-                                let customerDiscord = guild.members.cache.find(member => member.id === customer);
-                                // not group, only one user
-                                if (customerDiscord !== undefined) {
-                                    await ticketChannel.permissionOverwrites.edit(customerDiscord, {
-                                        VIEW_CHANNEL: true,
-                                        SEND_MESSAGES: true,
-                                    });
-                                }
+                    await guild.channels.create(customerHash).then(async channel => {
+                        await channel.setParent(ticketInfo.category).then(async ticketChannel => {
+                            const [embed, buttons] = createTicketEmbed(ticketChannel, ticketInfo, false);
+                            await ticketChannel.send({ embeds: [embed], components: [buttons] }).then(async () => {
+                                let customerIds;
                                 // group
+                                if (group) {
+                                    customerIds = (await notion.getUsersIdsByGroupId(customer)).UsersDiscordIds;
+                                }
+                                // single user
                                 else {
-                                    const customerIds = (await notion.getUsersIdsByGroupId(customer)).UsersDiscordIds;
-                                    for (const customerId of customerIds) {
-                                        customerDiscord = guild.members.cache.find(member => member.id === customerId);
-                                        if (customerDiscord !== undefined) {
-                                            await ticketChannel.permissionOverwrites.edit(customerDiscord, {
-                                                VIEW_CHANNEL: true,
-                                                SEND_MESSAGES: true,
-                                            });
-                                        }
+                                    customerIds = [customer];
+                                }
+                                for (const customerId of customerIds) {
+                                    const customerDiscord = guild.members.cache.find(member => member.id === customerId);
+                                    if (customerDiscord !== undefined) {
+                                        await ticketChannel.permissionOverwrites.edit(customerDiscord, {
+                                            VIEW_CHANNEL: true,
+                                            SEND_MESSAGES: true,
+                                        });
                                     }
+                                }
+                                if (response != null) {
+                                    response.code = 0;
+                                    response.channel_link = `https://discord.com/channels/${guild.id}/${ticketChannel.id}`;
                                 }
                                 if (interaction != null) {
                                     interaction.editReply(`${capitalize(ticketInfo.name)} Ticket <#${ticketChannel.id}> successfully opened!`);
@@ -82,22 +182,33 @@ module.exports = {
                     });
                 }
                 catch (e) {
-                    const display_message = 'There was a problem opening the ticket';
-                    if (interaction != null) {
-                        interaction.editReply(display_message);
+                    if (response != null) {
+                        response.code = -1;
                     }
-                    else if (message != null) {
-                        message.reply(display_message);
+                    else {
+                        const display_message = 'There was a problem opening the ticket';
+                        if (interaction != null) {
+                            interaction.editReply(display_message);
+                        }
+                        else if (message != null) {
+                            message.reply(display_message);
+                        }
                     }
                     console.error(e);
                 }
             }
-            else if (interaction != null) {
-                const ticketChannelId = getTicketChannel(guild, ticketInfo, customerHash).id;
-                interaction.editReply(`You already have a ${capitalize(ticketInfo.name)} Ticket <#${ticketChannelId}> opened!`);
-            }
-            else if (message != null) {
-                message.reply(`Already existing channel in ${ticketInfo.name} category!`);
+            else {
+                const ticketChannelId = getTicketChannel(ticketInfo, customerHash).id;
+                if (response != null) {
+                    response.code = 3;
+                    response.channel_link = `https://discord.com/channels/${guild.id}/${ticketChannelId}`;
+                }
+                else if (interaction != null) {
+                    interaction.editReply(`You already have a ${capitalize(ticketInfo.name)} Ticket <#${ticketChannelId}> opened!`);
+                }
+                else if (message != null) {
+                    message.reply(`Already existing channel <#${ticketChannelId}> in ${ticketInfo.name} category!`);
+                }
             }
         }
         else if (message != null) {
@@ -105,12 +216,12 @@ module.exports = {
         }
     },
 
-    close: async (guild, ticketType, customerHash, interaction, message) => {
+    close: async (ticketType, customerHash, interaction, message) => {
         const ticketInfo = getTicketInfo(ticketType);
         if (ticketInfo !== undefined) {
-            if (exists(guild, ticketInfo, customerHash)) {
+            if (exists(ticketInfo, customerHash)) {
                 try {
-                    const ticketChannel = getTicketChannel(guild, ticketInfo, customerHash);
+                    const ticketChannel = getTicketChannel(ticketInfo, customerHash);
                     const transcriptChannel = guild.channels.cache.find(channel => channel.id === ticketInfo.log);
                     const date = new Date();
                     const transcript = await createTranscript(ticketChannel, {
@@ -169,14 +280,14 @@ module.exports = {
         }
     },
 
-    alternateLock: async (guild, ticketType, customerHash, lock, interaction, message) => {
+    alternateLock: async (ticketType, customerHash, lock, interaction, message) => {
         // lock = true => lock ticket
         // lock = false => unlock ticket
         const ticketInfo = getTicketInfo(ticketType);
         if (ticketInfo !== undefined) {
-            if (exists(guild, ticketInfo, customerHash)) {
+            if (exists(ticketInfo, customerHash)) {
                 try {
-                    const ticketChannel = getTicketChannel(guild, ticketInfo, customerHash);
+                    const ticketChannel = getTicketChannel(ticketInfo, customerHash);
                     const customerIds = ticketChannel.permissionOverwrites.cache.filter(member => member.type === 'member').map(member => {
                         return member.id;
                     });
@@ -190,7 +301,7 @@ module.exports = {
                     }
                     ticketChannel.messages.fetch({ after: 1, limit: 1 }).then(ticketMessages => {
                         const embedTicketMessage = ticketMessages.first();
-                        const [embed, buttons] = createTicketEmbed(guild, ticketChannel, ticketInfo, lock);
+                        const [embed, buttons] = createTicketEmbed(ticketChannel, ticketInfo, lock);
                         embedTicketMessage.edit({ embeds: [embed], components: [buttons] }).then(() => {
                             const display_message = (lock ? '🔒' : '🔓') + ' Ticket ' + (lock ? 'locked' : 'unlocked') + '!';
                             if (interaction != null) {
@@ -223,72 +334,3 @@ module.exports = {
     },
 
 };
-
-function getOpenInteractionList() {
-    // no button for invoice tickets, those are auto generated
-    return config.tickets.filter(ticketInfo => ticketInfo.name !== 'invoice').map(ticketInfo => {
-        return {
-            name: ticketInfo.name,
-            customer: ticketInfo.customer,
-            description: ticketInfo.description,
-            emoji: ticketInfo.emoji,
-            id: 'open_' + ticketInfo.name + '_ticket',
-        };
-    });
-}
-
-function getTicketInfo(ticketType) {
-    return config.tickets.find(ticketInfo => ticketInfo.name === ticketType);
-}
-
-function exists(guild, ticketInfo, customerHash) {
-    return guild.channels.cache.some(channel => channel.parentId === ticketInfo.category && channel.name === customerHash);
-}
-
-function getTicketChannel(guild, ticketInfo, customerHash) {
-    return guild.channels.cache.find(channel => channel.parentId === ticketInfo.category && channel.name === customerHash);
-}
-
-function createTicketEmbed(guild, ticketChannel, ticketInfo, locked) {
-    const bot = guild.members.cache.find(member => member.id === config.client);
-    const embed = {
-        color: locked ? config.colors.red : config.colors.blue,
-        author: { name: `Welcome to ${capitalize(ticketInfo.name)} Ticket` },
-        description: 'Please be patient, we will answer as soon as possible.',
-        thumbnail: { url: bot.displayAvatarURL({ size: 4096, dynamic: true }) },
-        fields: [
-            { name: 'Important information', value: ticketInfo.info.join('\n') },
-            { name: 'Status', value: locked ? '🔒 Locked' : '🔓 Unlocked' },
-        ],
-        timestamp: new Date(),
-        footer: { text: `ID: ${ticketChannel.id}` },
-    };
-    const buttons = new MessageActionRow()
-        .addComponents(
-            new MessageButton()
-                .setCustomId('save_close_ticket')
-                .setLabel('💾 Save & Close')
-                .setStyle('PRIMARY'),
-            new MessageButton()
-                .setURL('https://xnorm.cloud')
-                .setLabel('🌐 Website')
-                .setStyle('LINK'),
-        );
-    if (locked) {
-        buttons.addComponents(
-            new MessageButton()
-                .setCustomId('unlock_ticket')
-                .setLabel('🔓 Unlock')
-                .setStyle('SUCCESS'),
-        );
-    }
-    else {
-        buttons.addComponents(
-            new MessageButton()
-                .setCustomId('lock_ticket')
-                .setLabel('🔒 Lock')
-                .setStyle('DANGER'),
-        );
-    }
-    return [embed, buttons];
-}

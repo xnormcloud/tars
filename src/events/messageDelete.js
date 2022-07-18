@@ -3,7 +3,7 @@ const config = require('../../config.json');
 module.exports = {
     name: 'messageDelete',
     once: false,
-    run(logChannel, message) {
+    run: (logChannel, message) => {
         // prevents crashing if message content is empty
         if (message.content === '') return;
         // log

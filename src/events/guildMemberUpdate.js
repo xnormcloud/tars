@@ -3,7 +3,7 @@ const config = require('../../config.json');
 module.exports = {
     name: 'guildMemberUpdate',
     once: false,
-    run(logChannel, oldMember, newMember) {
+    run: (logChannel, oldMember, newMember) => {
         let cont;
         const avatar = newMember.user.displayAvatarURL({ size: 4096, dynamic: true });
         // role changed

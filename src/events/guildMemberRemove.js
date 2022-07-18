@@ -3,7 +3,7 @@ const config = require('../../config.json');
 module.exports = {
     name: 'guildMemberRemove',
     once: false,
-    run(logChannel, member) {
+    run: (logChannel, member) => {
         // log
         const avatar = member.user.displayAvatarURL({ size: 4096, dynamic: true });
         const embed = {
