@@ -10,8 +10,10 @@ app.use(helmet({
 }));
 app.use(express.json());
 
-const ticketRoute = require('./routes/ticket');
+const ticketRoute = require('./routes/ticket.js');
 app.use('/ticket', ticketRoute);
+const discordRoute = require('./routes/discord.js');
+app.use('/discord', discordRoute);
 app.get('/', async (req, res) => {
     res.sendStatus(200);
 });
