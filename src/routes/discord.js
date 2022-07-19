@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const request = require('../utils/request.js');
+const responseCodes = require('../constants/responseCodes.json');
 const { isInsideDiscord } = require('../systems/ticket.js');
 
 const processRequest = (req, res) => {
@@ -7,14 +8,14 @@ const processRequest = (req, res) => {
     // bad request or userId not valid as a discord id
     if (request.isValidRequest(body, 'userId') && body.userId.length === 18) {
         if (isInsideDiscord(body.userId)) {
-            res.send('302');
+            res.send(responseCodes.found);
         }
         else {
-            res.send('404');
+            res.send(responseCodes.notFound);
         }
     }
     else {
-        res.send('400');
+        res.send(responseCodes.badRequest);
     }
 };
 

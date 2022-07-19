@@ -3,6 +3,7 @@ const { createTranscript } = require('discord-html-transcripts');
 const config = require('../../config.json');
 const notion = require('../database/notion.js');
 const hash = require('../utils/hash.js');
+const responseCodes = require('../constants/responseCodes.json');
 const { capitalize } = require('../utils/string.js');
 
 let guild;
@@ -120,44 +121,47 @@ module.exports = {
     open: async (ticketType, customer, response, interaction, message) => {
         const ticketInfo = getTicketInfo(ticketType);
         if (ticketInfo !== undefined) {
-            let group = false;
-            let valid = false;
-            const customerLen = customer.length;
-            // discord id
-            if (customerLen === 18) {
-                // not inside discord
-                if (!module.exports.isInsideDiscord(customer) && response !== null) {
-                    response.code = 2;
-                    return;
-                }
-                valid = true;
-            }
-            // group id
-            else if (customerLen === 32) {
-                group = true;
-                valid = true;
-            }
-            // not valid id
-            if (!valid && response !== null) {
-                response.code = 1;
-                return;
-            }
             const customerHash = hash.convert(customer);
             if (!exists(ticketInfo, customerHash)) {
+                const customerLen = customer.length;
+                let customerIds;
+                // discord id
+                if (customerLen === 18) {
+                    // inside discord
+                    if (module.exports.isInsideDiscord(customer)) {
+                        customerIds = [customer];
+                    }
+                    else {
+                        if (response !== null) {
+                            response.code = responseCodes.notFound;
+                        }
+                        return;
+                    }
+                }
+                // group id
+                else if (customerLen === 32) {
+                    customerIds = (await notion.getUsersIdsByGroupId(customer)).UsersDiscordIds;
+                    // not inside notion database
+                    if (customerIds.length === 0) {
+                        if (response !== null) {
+                            response.code = responseCodes.notFound;
+                        }
+                        return;
+                    }
+                }
+                // not valid id
+                else {
+                    if (response !== null) {
+                        response.code = responseCodes.badRequest;
+                    }
+                    return;
+                }
+                // create
                 try {
                     await guild.channels.create(customerHash).then(async channel => {
                         await channel.setParent(ticketInfo.category).then(async ticketChannel => {
                             const [embed, buttons] = createTicketEmbed(ticketChannel, ticketInfo, false);
                             await ticketChannel.send({ embeds: [embed], components: [buttons] }).then(async () => {
-                                let customerIds;
-                                // group
-                                if (group) {
-                                    customerIds = (await notion.getUsersIdsByGroupId(customer)).UsersDiscordIds;
-                                }
-                                // single user
-                                else {
-                                    customerIds = [customer];
-                                }
                                 for (const customerId of customerIds) {
                                     const customerDiscord = guild.members.cache.find(member => member.id === customerId);
                                     if (customerDiscord !== undefined) {
@@ -168,10 +172,10 @@ module.exports = {
                                     }
                                 }
                                 if (response != null) {
-                                    response.code = 0;
-                                    response.channel_link = `https://discord.com/channels/${guild.id}/${ticketChannel.id}`;
+                                    response.code = responseCodes.ok;
+                                    response.channelLink = `https://discord.com/channels/${guild.id}/${ticketChannel.id}`;
                                 }
-                                if (interaction != null) {
+                                else if (interaction != null) {
                                     interaction.editReply(`${capitalize(ticketInfo.name)} Ticket <#${ticketChannel.id}> successfully opened!`);
                                 }
                                 else if (message != null) {
@@ -183,7 +187,7 @@ module.exports = {
                 }
                 catch (e) {
                     if (response != null) {
-                        response.code = -1;
+                        response.code = responseCodes.internalServerError;
                     }
                     else {
                         const display_message = 'There was a problem opening the ticket';
@@ -200,8 +204,8 @@ module.exports = {
             else {
                 const ticketChannelId = getTicketChannel(ticketInfo, customerHash).id;
                 if (response != null) {
-                    response.code = 3;
-                    response.channel_link = `https://discord.com/channels/${guild.id}/${ticketChannelId}`;
+                    response.code = responseCodes.found;
+                    response.channelLink = `https://discord.com/channels/${guild.id}/${ticketChannelId}`;
                 }
                 else if (interaction != null) {
                     interaction.editReply(`You already have a ${capitalize(ticketInfo.name)} Ticket <#${ticketChannelId}> opened!`);

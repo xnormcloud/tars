@@ -1,10 +1,11 @@
 const router = require('express').Router();
 const request = require('../utils/request');
+const responseCodes = require('../constants/responseCodes.json');
 const ticket = require('../systems/ticket.js');
 
 const response = {
-    'code': -3,
-    'channel_link': '',
+    'code': '0',
+    'channelLink': '',
 };
 
 const processRequest = async (type, req, res) => {
@@ -14,7 +15,7 @@ const processRequest = async (type, req, res) => {
         await ticket.open(type, body.userId, cloneResponse, null, null);
     }
     else {
-        cloneResponse.code = 400;
+        cloneResponse.code = responseCodes.badRequest;
     }
     res.send(cloneResponse);
 };
@@ -29,10 +30,6 @@ router.post('/order', async (req, res) => {
 
 router.post('/support', async (req, res) => {
     await processRequest('support', req, res);
-});
-
-router.post('/invoice', async (req, res) => {
-    await processRequest('invoice', req, res);
 });
 
 module.exports = router;
