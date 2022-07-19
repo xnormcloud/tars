@@ -32,8 +32,4 @@ router.post('/support', async (req, res) => {
     await processRequest('support', req, res);
 });
 
-router.post('/invoice', async (req, res) => {
-    await processRequest('invoice', req, res);
-});
-
 module.exports = router;
