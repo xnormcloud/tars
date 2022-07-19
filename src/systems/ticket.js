@@ -3,6 +3,7 @@ const { createTranscript } = require('discord-html-transcripts');
 const config = require('../../config.json');
 const notion = require('../database/notion.js');
 const hash = require('../utils/hash.js');
+const responseCodes = require('../constants/responseCodes.json');
 const { capitalize } = require('../utils/string.js');
 
 let guild;
@@ -126,8 +127,10 @@ module.exports = {
             // discord id
             if (customerLen === 18) {
                 // not inside discord
-                if (!module.exports.isInsideDiscord(customer) && response !== null) {
-                    response.code = 2;
+                if (!module.exports.isInsideDiscord(customer)) {
+                    if (response !== null) {
+                        response.code = responseCodes.notFound;
+                    }
                     return;
                 }
                 valid = true;
@@ -139,7 +142,7 @@ module.exports = {
             }
             // not valid id
             if (!valid && response !== null) {
-                response.code = 1;
+                response.code = responseCodes.badRequest;
                 return;
             }
             const customerHash = hash.convert(customer);
@@ -168,10 +171,10 @@ module.exports = {
                                     }
                                 }
                                 if (response != null) {
-                                    response.code = 0;
-                                    response.channel_link = `https://discord.com/channels/${guild.id}/${ticketChannel.id}`;
+                                    response.code = responseCodes.ok;
+                                    response.channelLink = `https://discord.com/channels/${guild.id}/${ticketChannel.id}`;
                                 }
-                                if (interaction != null) {
+                                else if (interaction != null) {
                                     interaction.editReply(`${capitalize(ticketInfo.name)} Ticket <#${ticketChannel.id}> successfully opened!`);
                                 }
                                 else if (message != null) {
@@ -183,7 +186,7 @@ module.exports = {
                 }
                 catch (e) {
                     if (response != null) {
-                        response.code = -1;
+                        response.code = responseCodes.internalServerError;
                     }
                     else {
                         const display_message = 'There was a problem opening the ticket';
@@ -200,8 +203,8 @@ module.exports = {
             else {
                 const ticketChannelId = getTicketChannel(ticketInfo, customerHash).id;
                 if (response != null) {
-                    response.code = 3;
-                    response.channel_link = `https://discord.com/channels/${guild.id}/${ticketChannelId}`;
+                    response.code = responseCodes.found;
+                    response.channelLink = `https://discord.com/channels/${guild.id}/${ticketChannelId}`;
                 }
                 else if (interaction != null) {
                     interaction.editReply(`You already have a ${capitalize(ticketInfo.name)} Ticket <#${ticketChannelId}> opened!`);
