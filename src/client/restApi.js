@@ -4,9 +4,7 @@ const app = express();
 const argument = process.argv[2];
 const port = argument === '-t' ? 6000 : argument === '-p' ? 5023 : 5000;
 const fs = require('fs');
-
-const path = require('path');
-const dirname = path.resolve();
+const { dirname } = require('../constants/general.js');
 
 const registerRoutes = async () => {
     const routeFiles = fs.readdirSync(`${dirname}/src/routes`).filter(file => file.endsWith('.js'));

@@ -3,11 +3,9 @@ const fs = require('fs');
 const config = require('../../config.json');
 require('dotenv').config();
 const discordBotToken = process.env.DISCORD_BOT_TOKEN;
+const { dirname } = require('../constants/general.js');
 const discordConstants = require('../constants/discord.js');
 const restApi = require('./restApi.js');
-
-const path = require('path');
-const dirname = path.resolve();
 
 class ExtendedClient extends Client {
 
@@ -44,37 +42,6 @@ class ExtendedClient extends Client {
         handlerFiles.forEach(handlerFile => {
             const handler = require(`../handlers/${handlerFile}`);
             handler.start();
-        });
-        // commands register
-        const commandFiles = fs.readdirSync(`${dirname}/src/commands`).filter(file => file.endsWith('.js'));
-        // commands loader
-        for (const file of commandFiles) {
-            const command = require(`../commands/${file}`);
-            if (!command.name) return; // avoid empty command files
-            this.commands.set(command.name, command);
-            console.log('\x1b[32m%s\x1b[0m', `[commands] ${command.name} loaded`);
-        }
-        // events register
-        const eventFiles = fs.readdirSync(`${dirname}/src/events`).filter(file => file.endsWith('.js'));
-        const events = eventFiles.map(file => require(`../events/${file}`));
-        // events loader
-        events.forEach(event => {
-            if (!event.name) return; // avoid empty event files
-            // client.once
-            if (event.once && event.name !== 'ready') {
-                this.once(event.name, (...args) => event.run(...args));
-                console.log('\x1b[34m%s\x1b[0m', `[events] client.once(${event.name}) loaded`);
-            }
-            // client.on
-            else if (!event.once) {
-                if (event.name === 'messageCreate') {
-                    this.on(event.name, (...args) => event.run(this.commands, ...args));
-                }
-                else {
-                    this.on(event.name, (...args) => event.run(...args));
-                }
-                console.log('\x1b[34m%s\x1b[0m', `[events] client.on(${event.name}) loaded`);
-            }
         });
         // ticket discord message init
         const ticket = require('../systems/ticket.js');
