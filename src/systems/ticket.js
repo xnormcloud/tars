@@ -4,7 +4,8 @@ const config = require('../../config.json');
 const notion = require('../database/notion.js');
 const hash = require('../utils/hash.js');
 const responseCodes = require('../constants/responseCodes.json');
-const { guild, ticketChannel } = require('../constants/discord.js');
+const { client, guild, ticketChannel } = require('../constants/discord.js');
+const { findAvatar } = require('../utils/discord.js');
 const { capitalize } = require('../utils/string.js');
 
 const getTicketInfo = ticketType => {
@@ -20,12 +21,11 @@ const getOpenTicketChannel = (ticketInfo, customerHash) => {
 };
 
 const createTicketEmbed = (openTicketChannel, ticketInfo, locked) => {
-    const bot = guild.members.cache.find(member => member.id === config.client);
     const embed = {
         color: locked ? config.colors.red : config.colors.blue,
         author: { name: `Welcome to ${capitalize(ticketInfo.name)} Ticket` },
         description: 'Please be patient, we will answer as soon as possible.',
-        thumbnail: { url: bot.displayAvatarURL({ size: 4096, dynamic: true }) },
+        thumbnail: { url: findAvatar(client) },
         fields: [
             { name: 'Important information', value: ticketInfo.info.join('\n') },
             { name: 'Status', value: locked ? '🔒 Locked' : '🔓 Unlocked' },

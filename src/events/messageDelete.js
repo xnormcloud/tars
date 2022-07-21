@@ -1,5 +1,6 @@
 const config = require('../../config.json');
-const { logChannel } = require('../constants/discord.js');
+const { client, logChannel } = require('../constants/discord.js');
+const { findAvatar } = require('../utils/discord');
 
 module.exports = {
     name: 'messageDelete',
@@ -8,11 +9,11 @@ module.exports = {
         // prevents crashing if message content is empty
         if (message.content === '') return;
         // log
-        const avatar = message.author.displayAvatarURL({ size: 4096, dynamic: true });
         const embed = {
             color: config.colors.red,
-            author: { name: 'Message Deleted', icon_url: avatar },
+            author: { name: 'Message Deleted', icon_url: findAvatar(client.user) },
             description: `<@${message.author.id}>\n${message.author.tag}`,
+            thumbnail: { url: findAvatar(message.author) },
             fields: [
                 { name: 'Message', value: message.content },
                 { name: 'Channel', value: `<#${message.channel.id}>` },

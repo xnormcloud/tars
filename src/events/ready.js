@@ -2,6 +2,7 @@
 // const { Routes } = require('discord-api-types/v9');
 const config = require('../../config.json');
 const { logChannel } = require('../constants/discord.js');
+const { findAvatar } = require('../utils/discord');
 
 module.exports = {
     name: 'ready',
@@ -44,7 +45,7 @@ module.exports = {
         console.log('\x1b[36m%s\x1b[0m', `${client.user.username} ready!`);
         const embed = {
             color: config.colors.blue,
-            author: { name: `☑️ ${client.user.username} ON!`, icon_url: client.user.displayAvatarURL({ size: 4096, dynamic: true }) },
+            author: { name: `☑️ ${client.user.username} ON!`, icon_url: findAvatar(client.user) },
             description: '[xnorm-cloud](https://xnorm.cloud)',
             timestamp: new Date(),
             footer: { text: `ID: ${client.user.id}` },

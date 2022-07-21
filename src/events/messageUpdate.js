@@ -1,5 +1,6 @@
 const config = require('../../config.json');
-const { logChannel } = require('../constants/discord.js');
+const { client, logChannel } = require('../constants/discord.js');
+const { findAvatar } = require('../utils/discord');
 
 module.exports = {
     name: 'messageUpdate',
@@ -10,11 +11,11 @@ module.exports = {
         // checks if it's a content change
         if (newMessage.content !== oldMessage.content) {
             // log
-            const avatar = newMessage.author.displayAvatarURL({ size: 4096, dynamic: true });
             const embed = {
                 color: config.colors.orange,
-                author: { name: 'Message Edited', icon_url: avatar },
+                author: { name: 'Message Edited', icon_url: findAvatar(client.user) },
                 description: `<@${newMessage.author.id}>\n${newMessage.author.tag}`,
+                thumbnail: { url: findAvatar(newMessage.author) },
                 fields: [
                     { name: 'New Message', value: newMessage.content },
                     { name: 'Old Message', value: oldMessage.content },
