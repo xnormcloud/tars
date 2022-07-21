@@ -1,9 +1,8 @@
 const { Client, Collection } = require('discord.js');
-const fs = require('fs');
 const config = require('../../config.json');
 require('dotenv').config();
 const discordBotToken = process.env.DISCORD_BOT_TOKEN;
-const { dirname } = require('../constants/general.js');
+const { findFiles } = require('../utils/internal.js');
 const discordConstants = require('../constants/discord.js');
 const restApi = require('./restApi.js');
 
@@ -38,14 +37,14 @@ class ExtendedClient extends Client {
         // init discord constants
         discordConstants.initDiscordConstants(this);
         // handlers
-        const handlerFiles = fs.readdirSync(`${dirname}/src/handlers`).filter(file => file.endsWith('.js'));
+        const handlerFiles = findFiles('/src/handlers');
         handlerFiles.forEach(handlerFile => {
             const handler = require(`../handlers/${handlerFile}`);
             handler.start();
         });
         // ticket discord message init
-        const ticket = require('../systems/ticket.js');
-        await ticket.initDiscordMessage().then(() =>
+        const { initDiscordMessage } = require('../systems/ticket.js');
+        await initDiscordMessage().then(() =>
             console.log('\x1b[36m%s\x1b[0m', '[ticket] discord message init succeed'),
         );
         console.log('\x1b[36m%s\x1b[0m', '[modules] everything loaded successfully');

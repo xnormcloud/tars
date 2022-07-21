@@ -1,11 +1,10 @@
-const fs = require('fs');
-const { dirname } = require('../constants/general.js');
+const { findFiles } = require('../utils/internal.js');
 const { client } = require('../constants/discord.js');
 
 module.exports = {
 
     start: () => {
-        const eventFiles = fs.readdirSync(`${dirname}/src/events`).filter(file => file.endsWith('.js'));
+        const eventFiles = findFiles('/src/events');
         eventFiles.forEach(eventFile => {
             const event = require(`../events/${eventFile}`);
             if (!event.name) return; // avoid empty event files

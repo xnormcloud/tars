@@ -1,11 +1,10 @@
-const fs = require('fs');
-const { dirname } = require('../constants/general.js');
+const { findFiles } = require('../utils/internal.js');
 const { client } = require('../constants/discord.js');
 
 module.exports = {
 
     start: () => {
-        const commandFiles = fs.readdirSync(`${dirname}/src/commands`).filter(file => file.endsWith('.js'));
+        const commandFiles = findFiles('/src/commands');
         commandFiles.forEach(commandFile => {
             const command = require(`../commands/${commandFile}`);
             if (!command.name) return; // avoid empty command files
