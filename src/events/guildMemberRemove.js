@@ -1,9 +1,10 @@
 const config = require('../../config.json');
+const { logChannel } = require('../constants/discord.js');
 
 module.exports = {
     name: 'guildMemberRemove',
     once: false,
-    run: (logChannel, member) => {
+    run: member => {
         // log
         const avatar = member.user.displayAvatarURL({ size: 4096, dynamic: true });
         const embed = {

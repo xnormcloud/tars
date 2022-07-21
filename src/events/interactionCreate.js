@@ -22,7 +22,7 @@ const isAdmin = (member, interaction) => {
 module.exports = {
     name: 'interactionCreate',
     once: false,
-    run: async (logChannel, interaction) => {
+    run: async interaction => {
         /* slash commands
         // interaction commands
         if (interaction.isCommand()) {

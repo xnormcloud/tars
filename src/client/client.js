@@ -3,7 +3,8 @@ const fs = require('fs');
 const config = require('../../config.json');
 require('dotenv').config();
 const discordBotToken = process.env.DISCORD_BOT_TOKEN;
-const ticket = require('../systems/ticket.js');
+const discordConstants = require('../constants/discord.js');
+const restApi = require('./restApi.js');
 
 const path = require('path');
 const dirname = path.resolve();
@@ -32,10 +33,17 @@ class ExtendedClient extends Client {
     run() {
         this.login(discordBotToken).then(() => console.log('\x1b[36m%s\x1b[0m', '[login] login step succeed'));
         // TODO: fix execute ready.js from here
-        this.once('ready', () => this.registerModules());
+        this.once('ready', () => this.registerModules().then(() => restApi.start()));
     }
 
     async registerModules() {
+        // init discord constants
+        discordConstants.initDiscordConstants(this);
+        // handlers
+        const handlerFiles = fs.readdirSync(`${dirname}/src/handlers`).filter(file => file.endsWith('.js'));
+        handlerFiles.forEach(handler => {
+            require(`../handlers/${handler}`)();
+        });
         // commands register
         const commandFiles = fs.readdirSync(`${dirname}/src/commands`).filter(file => file.endsWith('.js'));
         // commands loader
@@ -48,8 +56,6 @@ class ExtendedClient extends Client {
         // events register
         const eventFiles = fs.readdirSync(`${dirname}/src/events`).filter(file => file.endsWith('.js'));
         const events = eventFiles.map(file => require(`../events/${file}`));
-        const guild = this.guilds.cache.get(config.guild);
-        const logChannel = this.channels.cache.find(channel => channel.id === config.channels.log);
         // events loader
         events.forEach(event => {
             if (!event.name) return; // avoid empty event files
@@ -61,20 +67,17 @@ class ExtendedClient extends Client {
             // client.on
             else if (!event.once) {
                 if (event.name === 'messageCreate') {
-                    this.on(event.name, (...args) => event.run(guild, this.commands, ...args));
+                    this.on(event.name, (...args) => event.run(this.commands, ...args));
                 }
                 else {
-                    this.on(event.name, (...args) => event.run(logChannel, ...args));
+                    this.on(event.name, (...args) => event.run(...args));
                 }
                 console.log('\x1b[34m%s\x1b[0m', `[events] client.on(${event.name}) loaded`);
             }
         });
-        // ticket guild init
-        ticket.initGuild(guild).then(() =>
-            console.log('\x1b[36m%s\x1b[0m', '[ticket] guild init succeed'),
-        );
         // ticket discord message init
-        await ticket.initDiscordMessage(guild).then(() =>
+        const ticket = require('../systems/ticket.js');
+        await ticket.initDiscordMessage().then(() =>
             console.log('\x1b[36m%s\x1b[0m', '[ticket] discord message init succeed'),
         );
         console.log('\x1b[36m%s\x1b[0m', '[modules] everything loaded successfully');

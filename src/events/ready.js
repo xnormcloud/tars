@@ -1,6 +1,7 @@
 // const { REST } = require('@discordjs/rest');
 // const { Routes } = require('discord-api-types/v9');
 const config = require('../../config.json');
+const { logChannel } = require('../constants/discord.js');
 
 module.exports = {
     name: 'ready',
@@ -41,7 +42,6 @@ module.exports = {
         */
         // log
         console.log('\x1b[36m%s\x1b[0m', `${client.user.username} ready!`);
-        const logChannel = client.channels.cache.find(channel => channel.id === config.channels.log);
         const embed = {
             color: config.colors.blue,
             author: { name: `☑️ ${client.user.username} ON!`, icon_url: client.user.displayAvatarURL({ size: 4096, dynamic: true }) },

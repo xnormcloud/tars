@@ -1,9 +1,10 @@
 const config = require('../../config.json');
+const { logChannel } = require('../constants/discord.js');
 
 module.exports = {
     name: 'messageDelete',
     once: false,
-    run: (logChannel, message) => {
+    run: message => {
         // prevents crashing if message content is empty
         if (message.content === '') return;
         // log

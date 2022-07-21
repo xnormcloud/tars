@@ -1,18 +1,18 @@
 const config = require('../../config.json');
 
-const runCommand = (command, commands, guild, message, args) => {
+const runCommand = (command, commands, message, args) => {
     if (command.name === 'help') {
         command.run(message, commands);
     }
     else {
-        command.run(guild, message, args);
+        command.run(message, args);
     }
 };
 
 module.exports = {
     name: 'messageCreate',
     once: false,
-    run: (guild, commands, message) => {
+    run: (commands, message) => {
         // not a command
         if (!message.content.startsWith(config.prefix)) return;
         // command ->
@@ -24,14 +24,14 @@ module.exports = {
             try {
                 if (command.permission != null) {
                     if (message.member.permissions.has(command.permission || [])) {
-                        runCommand(command, commands, guild, message, args);
+                        runCommand(command, commands, message, args);
                     }
                     else {
                         message.reply('You don\'t have permission to execute this command!');
                     }
                 }
                 else {
-                    runCommand(command, commands, guild, message, args);
+                    runCommand(command, commands, message, args);
                 }
             }
             catch (e) {

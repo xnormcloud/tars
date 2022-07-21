@@ -1,9 +1,10 @@
 const config = require('../../config.json');
+const { logChannel } = require('../constants/discord.js');
 
 module.exports = {
     name: 'guildMemberUpdate',
     once: false,
-    run: (logChannel, oldMember, newMember) => {
+    run: (oldMember, newMember) => {
         let cont;
         const avatar = newMember.user.displayAvatarURL({ size: 4096, dynamic: true });
         // role changed
