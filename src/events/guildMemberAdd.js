@@ -1,6 +1,6 @@
 const config = require('../../config.json');
 const { client, joinChannel, logChannel } = require('../constants/discord.js');
-const { findAvatar } = require('../utils/discord');
+const { findAvatar } = require('../utils/discord.js');
 
 module.exports = {
     name: 'guildMemberAdd',

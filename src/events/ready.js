@@ -2,7 +2,7 @@
 // const { Routes } = require('discord-api-types/v9');
 const config = require('../../config.json');
 const { logChannel } = require('../constants/discord.js');
-const { findAvatar } = require('../utils/discord');
+const { findAvatar } = require('../utils/discord.js');
 
 module.exports = {
     name: 'ready',

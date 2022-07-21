@@ -25,7 +25,7 @@ const createTicketEmbed = (openTicketChannel, ticketInfo, locked) => {
         color: locked ? config.colors.red : config.colors.blue,
         author: { name: `Welcome to ${capitalize(ticketInfo.name)} Ticket` },
         description: 'Please be patient, we will answer as soon as possible.',
-        thumbnail: { url: findAvatar(client) },
+        thumbnail: { url: findAvatar(client.user) },
         fields: [
             { name: 'Important information', value: ticketInfo.info.join('\n') },
             { name: 'Status', value: locked ? '🔒 Locked' : '🔓 Unlocked' },
@@ -68,12 +68,11 @@ module.exports = {
     initDiscordMessage: async () => {
         ticketChannel.messages.fetch({ after: 1, limit: 1 }).then(ticketMessages => {
             if (ticketMessages.size !== 0) return;
-            const bot = guild.members.cache.find(member => member.id === config.client);
             const embed = {
                 color: config.colors.blue,
                 author: { name: 'Open Ticket Tool' },
                 description: 'Select what category you want to open a ticket inside',
-                thumbnail: { url: bot.displayAvatarURL({ size: 4096, dynamic: true }) },
+                thumbnail: { url: findAvatar(client.user) },
             };
             const buttons = new MessageActionRow();
             const fields = [];

@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const request = require('../utils/request');
+const request = require('../utils/request.js');
 const responseCodes = require('../constants/responseCodes.json');
 const ticket = require('../systems/ticket.js');
 
