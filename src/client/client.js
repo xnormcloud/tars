@@ -41,8 +41,9 @@ class ExtendedClient extends Client {
         discordConstants.initDiscordConstants(this);
         // handlers
         const handlerFiles = fs.readdirSync(`${dirname}/src/handlers`).filter(file => file.endsWith('.js'));
-        handlerFiles.forEach(handler => {
-            require(`../handlers/${handler}`)();
+        handlerFiles.forEach(handlerFile => {
+            const handler = require(`../handlers/${handlerFile}`);
+            handler.start();
         });
         // commands register
         const commandFiles = fs.readdirSync(`${dirname}/src/commands`).filter(file => file.endsWith('.js'));

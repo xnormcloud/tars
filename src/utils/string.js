@@ -4,4 +4,8 @@ module.exports = {
         return string.charAt(0).toUpperCase() + string.slice(1);
     },
 
+    codeFormat: string => {
+        return '```' + string + '```';
+    },
+
 };
