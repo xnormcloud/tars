@@ -3,6 +3,23 @@ const helmet = require('helmet');
 const app = express();
 const argument = process.argv[2];
 const port = argument === '-t' ? 6000 : argument === '-p' ? 5023 : 5000;
+const fs = require('fs');
+
+const path = require('path');
+const dirname = path.resolve();
+
+const registerRoutes = async () => {
+    const routeFiles = fs.readdirSync(`${dirname}/src/routes`).filter(file => file.endsWith('.js'));
+    routeFiles.forEach(async routeFile => {
+        const route = require(`../routes/${routeFile}`);
+        const routeName = `/${routeFile.slice(0, -3)}`;
+        app.use(routeName, route);
+        console.log('\x1b[32m%s\x1b[0m', `[routes] ${routeName} loaded`);
+    });
+    app.get('/', async (req, res) => {
+        res.sendStatus(200);
+    });
+};
 
 module.exports = {
 
@@ -11,16 +28,11 @@ module.exports = {
             contentSecurityPolicy: false,
         }));
         app.use(express.json());
-        const ticketRoute = require('../routes/ticket.js');
-        app.use('/ticket', ticketRoute);
-        const discordRoute = require('../routes/discord.js');
-        app.use('/discord', discordRoute);
-        app.get('/', async (req, res) => {
-            res.sendStatus(200);
-        });
-        app.listen(port, () => {
-            console.log('Now listening to requests on port ' + `${port}`);
-            console.log(`Access by http://127.0.0.1:${port} (${port === 6000 ? 'test' : port === 5000 ? 'dev' : 'prod'})`);
+        registerRoutes().then(() => {
+            app.listen(port, () => {
+                console.log('\x1b[32m%s\x1b[0m', `[api] now listening to requests on port ${port}`);
+                console.log('\x1b[32m%s\x1b[0m', `[api] access by http://127.0.0.1:${port} (${port === 6000 ? 'test' : port === 5000 ? 'dev' : 'prod'})`);
+            });
         });
     },
 
