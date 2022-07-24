@@ -18,10 +18,10 @@ class ExtendedClient extends Client {
             presence: {
                 activities: [{
                     name: config.presence.activities.name,
-                    type: config.presence.activities.type[3], // [0]PLAYING, [1]STREAMING, [2]LISTENING, [3]WATCHING
+                    type: discordConstants.presence.activities.type[config.presence.activities.type], // [0]PLAYING, [1]STREAMING, [2]LISTENING, [3]WATCHING
                     url: config.url.twitch,
                 }],
-                status: config.presence.status[2], // [0]online, [1]idle, [2]dnd, [3]offline
+                status: discordConstants.presence.status[config.presence.status], // [0]online, [1]idle, [2]dnd, [3]offline
             },
         });
         // create commands collection
@@ -46,7 +46,7 @@ class ExtendedClient extends Client {
         // ticket discord message init
         const { initDiscordMessage } = require('../systems/ticket.js');
         await initDiscordMessage().then(() =>
-            console.log(colors.console.cyanReset, '[ticket] discord message init succeed'),
+            console.log(colors.console.orangeReset, '[ticket] discord message init succeed'),
         );
         console.log(colors.console.greenReset, '[bot] everything loaded successfully');
     }

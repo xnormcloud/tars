@@ -26,4 +26,21 @@ module.exports = {
     logChannel: null,
     errorChannel: null,
 
+    presence: {
+        activities: {
+            type: [
+                'PLAYING',
+                'STREAMING',
+                'LISTENING',
+                'WATCHING',
+            ],
+        },
+        status: [
+            'online',
+            'idle',
+            'dnd',
+            'offline',
+        ],
+    },
+
 };
