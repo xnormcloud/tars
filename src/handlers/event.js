@@ -4,7 +4,7 @@ const { client } = require('../constants/discord.js');
 
 module.exports = {
 
-    start: () => {
+    run: () => {
         const eventFiles = findFiles('/src/events');
         eventFiles.forEach(eventFile => {
             const event = require(`../events/${eventFile}`);

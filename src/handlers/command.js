@@ -4,7 +4,7 @@ const { client } = require('../constants/discord.js');
 
 module.exports = {
 
-    start: () => {
+    run: () => {
         const commandFiles = findFiles('/src/commands');
         commandFiles.forEach(commandFile => {
             const command = require(`../commands/${commandFile}`);
