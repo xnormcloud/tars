@@ -1,6 +1,7 @@
+const colors = require('./constants/colors.js');
 const { generateConfig } = require('./systems/config.js');
-if (generateConfig()) return console.log('Config generated, fill it and then start it again!');
+if (generateConfig()) return console.log(colors.console.orangeReset, 'Config generated, fill it and then start it again!');
 
-const ExtendedClient = require('./client/client.js');
-const discordClient = new ExtendedClient();
+const DiscordClient = require('./client/bot.js');
+const discordClient = new DiscordClient();
 discordClient.run();

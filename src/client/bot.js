@@ -5,9 +5,9 @@ const discordBotToken = process.env.DISCORD_BOT_TOKEN;
 const { findFiles } = require('../utils/internal.js');
 const colors = require('../constants/colors.js');
 const discordConstants = require('../constants/discord.js');
-const restApi = require('./restApi.js');
+const apiClient = require('./api.js');
 
-class ExtendedClient extends Client {
+class DiscordClient extends Client {
 
     constructor() {
         super({
@@ -31,7 +31,7 @@ class ExtendedClient extends Client {
     run() {
         this.login(discordBotToken).then(() => console.log(colors.console.orangeReset, '[bot] login step succeed'));
         // TODO: fix execute ready.js from here
-        this.once('ready', () => this.registerModules().then(() => restApi.start()));
+        this.once('ready', () => this.registerModules().then(() => apiClient.start()));
     }
 
     async registerModules() {
@@ -53,4 +53,4 @@ class ExtendedClient extends Client {
 
 }
 
-module.exports = ExtendedClient;
+module.exports = DiscordClient;
