@@ -3,6 +3,7 @@ const config = require('../../config.json');
 require('dotenv').config();
 const discordBotToken = process.env.DISCORD_BOT_TOKEN;
 const { findFiles } = require('../utils/internal.js');
+const colors = require('../constants/colors.js');
 const discordConstants = require('../constants/discord.js');
 const restApi = require('./restApi.js');
 
@@ -28,7 +29,7 @@ class ExtendedClient extends Client {
     }
 
     run() {
-        this.login(discordBotToken).then(() => console.log('\x1b[36m%s\x1b[0m', '[login] login step succeed'));
+        this.login(discordBotToken).then(() => console.log(colors.console.orangeReset, '[bot] login step succeed'));
         // TODO: fix execute ready.js from here
         this.once('ready', () => this.registerModules().then(() => restApi.start()));
     }
@@ -45,9 +46,9 @@ class ExtendedClient extends Client {
         // ticket discord message init
         const { initDiscordMessage } = require('../systems/ticket.js');
         await initDiscordMessage().then(() =>
-            console.log('\x1b[36m%s\x1b[0m', '[ticket] discord message init succeed'),
+            console.log(colors.console.cyanReset, '[ticket] discord message init succeed'),
         );
-        console.log('\x1b[36m%s\x1b[0m', '[modules] everything loaded successfully');
+        console.log(colors.console.greenReset, '[bot] everything loaded successfully');
     }
 
 }

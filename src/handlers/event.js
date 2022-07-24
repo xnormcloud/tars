@@ -1,3 +1,4 @@
+const colors = require('../constants/colors.js');
 const { findFiles } = require('../utils/internal.js');
 const { client } = require('../constants/discord.js');
 
@@ -11,7 +12,7 @@ module.exports = {
             // client.once
             if (event.once && event.name !== 'ready') {
                 client.once(event.name, (...args) => event.run(...args));
-                console.log('\x1b[34m%s\x1b[0m', `[events] client.once(${event.name}) loaded`);
+                console.log(colors.console.cyanReset, `[events] client.once(${event.name}) loaded`);
             }
             // client.on
             else if (!event.once) {
@@ -21,7 +22,7 @@ module.exports = {
                 else {
                     client.on(event.name, (...args) => event.run(...args));
                 }
-                console.log('\x1b[34m%s\x1b[0m', `[events] client.on(${event.name}) loaded`);
+                console.log(colors.console.cyanReset, `[events] client.on(${event.name}) loaded`);
             }
         });
     },
