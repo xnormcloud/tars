@@ -1,7 +1,7 @@
 const config = require('../../config.json');
 const notion = require('../database/notion.js');
 const ticket = require('../systems/ticket.js');
-const { capitalize } = require('../utils/string');
+const { capitalize } = require('../utils/string.js');
 
 const isValidUser = async (member, ticketInfoCustomer) => {
     if (ticketInfoCustomer) return await notion.userTypeById(member.id);
@@ -22,7 +22,7 @@ const isAdmin = (member, interaction) => {
 module.exports = {
     name: 'interactionCreate',
     once: false,
-    run: async (logChannel, interaction) => {
+    run: async interaction => {
         /* slash commands
         // interaction commands
         if (interaction.isCommand()) {

@@ -8,7 +8,7 @@ module.exports = {
         { name: 'open', description: 'opens new ticket', parameters: ['type', 'customerid'] },
         { name: 'close', description: 'closes opened ticket', parameters: ['type', 'customerid'] },
     ],
-    run: async (guild, message, args) => {
+    run: async (message, args) => {
         switch (args[0]) {
         case 'open':
             await ticket.open(args[1], args[2], null, null, message);

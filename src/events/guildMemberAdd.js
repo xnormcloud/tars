@@ -1,20 +1,20 @@
-const config = require('../../config.json');
+const colors = require('../constants/colors.js');
+const { client, joinChannel, logChannel } = require('../constants/discord.js');
+const { findAvatar } = require('../utils/discord.js');
 
 module.exports = {
     name: 'guildMemberAdd',
     once: false,
-    run: (logChannel, member) => {
+    run: member => {
         // join
-        const joinChannel = member.guild.channels.cache.get(config.channels.join);
         joinChannel.send(`👋🏻 Welcome to the server <@${member.id}>!`);
         // log & gets account creation date
         const date = new Date(member.user.createdTimestamp).toString();
-        const avatar = member.user.displayAvatarURL({ size: 4096, dynamic: true });
         const embed = {
-            color: config.colors.green,
-            author: { name: 'Member Joined', icon_url: avatar },
+            color: colors.embed.green,
+            author: { name: 'Member Joined', icon_url: findAvatar(client.user) },
             description: `<@${member.id}>\n${member.user.tag}`,
-            thumbnail: { url: avatar },
+            thumbnail: { url: findAvatar(member.user) },
             fields: [ { name: 'Account Creation Date', value: date.substring(0, date.length - 39) } ],
             timestamp: new Date(),
             footer: { text: `ID: ${member.id}` },

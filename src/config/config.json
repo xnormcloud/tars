@@ -8,6 +8,18 @@
         "log": "GENERAL LOG CHANNEL ID",
         "error": "ERROR LOG CHANNEL ID"
     },
+    "url": {
+        "net": ".NET WEBSITE",
+        "cloud": ".CLOUD WEBSITE",
+        "twitch": "TWITCH CHANNEL"
+    },
+    "presence": {
+        "activities": {
+            "name": "ACTIVITY NAME",
+            "type": 0
+        },
+        "status": 0
+    },
     "tickets": [
         {
             "name": "information",
@@ -57,33 +69,5 @@
                 "next line :)"
             ]
         }
-    ],
-    "url": {
-        "net": ".NET WEBSITE",
-        "cloud": ".CLOUD WEBSITE",
-        "twitch": "TWITCH CHANNEL"
-    },
-    "colors": {
-        "blue": "#1AA4E9",
-        "green": "#1CD57F",
-        "orange": "#FFA500",
-        "red": "#FF0000"
-    },
-    "presence": {
-        "activities": {
-            "name": "ACTIVITY NAME",
-            "type": [
-                "PLAYING",
-                "STREAMING",
-                "LISTENING",
-                "WATCHING"
-            ]
-        },
-        "status": [
-            "online",
-            "idle",
-            "dnd",
-            "offline"
-        ]
-    }
+    ]
 }

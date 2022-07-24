@@ -1,25 +1,28 @@
-const config = require('../../config.json');
+const colors = require('../constants/colors.js');
+const { client, logChannel } = require('../constants/discord.js');
+const { findAvatar } = require('../utils/discord.js');
 
 module.exports = {
     name: 'guildMemberUpdate',
     once: false,
-    run: (logChannel, oldMember, newMember) => {
+    run: (oldMember, newMember) => {
         let cont;
-        const avatar = newMember.user.displayAvatarURL({ size: 4096, dynamic: true });
+        const clientAvatar = findAvatar(client.user);
+        const memberAvatar = findAvatar(newMember.user);
         // role changed
         if (oldMember._roles.length !== newMember._roles.length) {
             // shared embed
             const embed = {
                 description: `<@${newMember.id}>\n${newMember.user.tag}`,
-                thumbnail: { url: avatar },
+                thumbnail: { url: memberAvatar },
                 timestamp: new Date(),
                 footer: { text: `ID: ${newMember.id}` },
             };
             // role added
             if (newMember._roles.length > oldMember._roles.length) {
                 // log
-                embed.color = config.colors.green;
-                embed.author = { name: 'Role Added', icon_url: avatar };
+                embed.color = colors.embed.green;
+                embed.author = { name: 'Role Added', icon_url: clientAvatar };
                 for (cont = 0; cont < newMember._roles.length; cont++) {
                     // searches the role checking inside oldMembers, newMember roles, finding the one it's only in newMember
                     if (!oldMember._roles.some(role => newMember._roles[cont].includes(role))) {
@@ -31,8 +34,8 @@ module.exports = {
             // role deleted
             else if (newMember._roles.length < oldMember._roles.length) {
                 // log
-                embed.color = config.colors.red;
-                embed.author = { name: 'Role Removed', icon_url: avatar };
+                embed.color = colors.embed.red;
+                embed.author = { name: 'Role Removed', icon_url: clientAvatar };
                 for (cont = 0; cont < oldMember._roles.length; cont++) {
                     // searches the role checking inside newMember, oldMember roles, finding the one it's only in oldMember
                     if (!newMember._roles.some(role => oldMember._roles[cont].includes(role))) {
@@ -46,10 +49,10 @@ module.exports = {
         else if (newMember.nickname !== oldMember.nickname) {
             // log
             const embed = {
-                color: config.colors.orange,
-                author: { name: 'Nickname Changed', icon_url: avatar },
+                color: colors.embed.orange,
+                author: { name: 'Nickname Changed', icon_url: clientAvatar },
                 description: `<@${newMember.id}>\n${newMember.user.tag}`,
-                thumbnail: { url: avatar },
+                thumbnail: { url: memberAvatar },
                 fields: [],
                 timestamp: new Date(),
                 footer: { text: `ID: ${newMember.id}` },
