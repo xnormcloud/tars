@@ -1,2 +1,3 @@
-# xnorm-cloud-bot
-discordbot for [xnormcloud](https://xnorm.cloud) behaviour
+# 🤖 TARS
+
+Rest api discord bot for [xnormcloud](https://xnorm.cloud) behaviour.
