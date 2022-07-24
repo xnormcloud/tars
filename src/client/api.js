@@ -21,7 +21,7 @@ const registerRoutes = async () => {
 
 module.exports = {
 
-    start: () => {
+    run: () => {
         app.use(helmet({
             contentSecurityPolicy: false,
         }));

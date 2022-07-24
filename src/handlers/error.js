@@ -18,7 +18,7 @@ const processError = (type, reason) => {
 
 module.exports = {
 
-    start: () => {
+    run: () => {
         process.on('unhandledRejection', (reason, p) => {
             processError('unhandledRejection', reason);
         });

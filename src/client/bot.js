@@ -31,7 +31,7 @@ class DiscordClient extends Client {
     run() {
         this.login(discordBotToken).then(() => console.log(colors.console.orangeReset, '[bot] login step succeed'));
         // TODO: fix execute ready.js from here
-        this.once('ready', () => this.registerModules().then(() => apiClient.start()));
+        this.once('ready', () => this.registerModules().then(() => apiClient.run()));
     }
 
     async registerModules() {
@@ -41,7 +41,7 @@ class DiscordClient extends Client {
         const handlerFiles = findFiles('/src/handlers');
         handlerFiles.forEach(handlerFile => {
             const handler = require(`../handlers/${handlerFile}`);
-            handler.start();
+            handler.run();
         });
         // ticket discord message init
         const { initDiscordMessage } = require('../systems/ticket.js');
