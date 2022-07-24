@@ -1,9 +1,10 @@
 const { MessageActionRow, MessageButton } = require('discord.js');
 const { createTranscript } = require('discord-html-transcripts');
 const config = require('../../config.json');
+const colors = require('../constants/colors.js');
+const responseCodes = require('../constants/responseCodes.json');
 const notion = require('../database/notion.js');
 const hash = require('../utils/hash.js');
-const responseCodes = require('../constants/responseCodes.json');
 const { client, guild, ticketChannel } = require('../constants/discord.js');
 const { findAvatar } = require('../utils/discord.js');
 const { capitalize } = require('../utils/string.js');
@@ -22,7 +23,7 @@ const getOpenTicketChannel = (ticketInfo, customerHash) => {
 
 const createTicketEmbed = (openTicketChannel, ticketInfo, locked) => {
     const embed = {
-        color: locked ? config.colors.red : config.colors.blue,
+        color: locked ? colors.embed.red : colors.embed.blue,
         author: { name: `Welcome to ${capitalize(ticketInfo.name)} Ticket` },
         description: 'Please be patient, we will answer as soon as possible.',
         thumbnail: { url: findAvatar(client.user) },
@@ -69,7 +70,7 @@ module.exports = {
         ticketChannel.messages.fetch({ after: 1, limit: 1 }).then(ticketMessages => {
             if (ticketMessages.size !== 0) return;
             const embed = {
-                color: config.colors.blue,
+                color: colors.embed.blue,
                 author: { name: 'Open Ticket Tool' },
                 description: 'Select what category you want to open a ticket inside',
                 thumbnail: { url: findAvatar(client.user) },
@@ -227,7 +228,7 @@ module.exports = {
                         fileName: `${ticketType}_${date.toString().substring(0, date.toString().length - 39)}${customerHash}.html`,
                     });
                     const embed = {
-                        color: config.colors.red,
+                        color: colors.embed.red,
                         author: {
                             name: `Transcript ${ticketType}`,
                             icon_url: guild.members.cache.get(config.client).displayAvatarURL({

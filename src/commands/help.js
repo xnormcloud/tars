@@ -1,12 +1,14 @@
-const config = require('../../config.json');
+const colors = require('../constants/colors.js');
+const { client } = require('../constants/discord.js');
+const { findAvatar } = require('../utils/discord.js');
 
 module.exports = {
     name: 'help',
     description: 'command help',
     run: (message, commands) => {
         const embed = {
-            color: config.colors.blue,
-            thumbnail: { url: message.guild.members.cache.get(config.client).displayAvatarURL({ size: 4096, dynamic: true }) },
+            color: colors.embed.blue,
+            thumbnail: { url: findAvatar(client) },
             fields: [],
             timestamp: new Date(),
             footer: { text: `ID: ${message.member.id}` },

@@ -1,4 +1,4 @@
-const config = require('../../config.json');
+const colors = require('../constants/colors.js');
 const { client, logChannel } = require('../constants/discord.js');
 const { findAvatar } = require('../utils/discord.js');
 
@@ -8,7 +8,7 @@ module.exports = {
     run: member => {
         // log
         const embed = {
-            color: config.colors.red,
+            color: colors.embed.red,
             author: { name: 'Member Left', icon_url: findAvatar(client.user) },
             description: `<@${member.id}>\n${member.user.tag}`,
             thumbnail: { url: findAvatar(member.user) },

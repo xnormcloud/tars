@@ -30,4 +30,13 @@ module.exports = {
 
     },
 
+    embed: {
+
+        blue: '#1AA4E9',
+        green: '#1CD57F',
+        orange: '#FFA500',
+        red: '#FF0000',
+
+    },
+
 };

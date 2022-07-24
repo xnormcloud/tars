@@ -1,4 +1,4 @@
-const config = require('../../config.json');
+const colors = require('../constants/colors.js');
 const { client, logChannel } = require('../constants/discord.js');
 const { findAvatar } = require('../utils/discord.js');
 const { codeFormat } = require('../utils/string.js');
@@ -11,7 +11,7 @@ module.exports = {
         if (message.content === '') return;
         // log
         const embed = {
-            color: config.colors.red,
+            color: colors.embed.red,
             author: { name: 'Message Deleted', icon_url: findAvatar(client.user) },
             description: `<@${message.author.id}>\n${message.author.tag}\n${codeFormat(message.content)}`,
             fields: [

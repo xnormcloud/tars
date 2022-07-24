@@ -1,4 +1,4 @@
-const config = require('../../config.json');
+const colors = require('../constants/colors.js');
 const { client, logChannel } = require('../constants/discord.js');
 const { findAvatar } = require('../utils/discord.js');
 
@@ -21,7 +21,7 @@ module.exports = {
             // role added
             if (newMember._roles.length > oldMember._roles.length) {
                 // log
-                embed.color = config.colors.green;
+                embed.color = colors.embed.green;
                 embed.author = { name: 'Role Added', icon_url: clientAvatar };
                 for (cont = 0; cont < newMember._roles.length; cont++) {
                     // searches the role checking inside oldMembers, newMember roles, finding the one it's only in newMember
@@ -34,7 +34,7 @@ module.exports = {
             // role deleted
             else if (newMember._roles.length < oldMember._roles.length) {
                 // log
-                embed.color = config.colors.red;
+                embed.color = colors.embed.red;
                 embed.author = { name: 'Role Removed', icon_url: clientAvatar };
                 for (cont = 0; cont < oldMember._roles.length; cont++) {
                     // searches the role checking inside newMember, oldMember roles, finding the one it's only in oldMember
@@ -49,7 +49,7 @@ module.exports = {
         else if (newMember.nickname !== oldMember.nickname) {
             // log
             const embed = {
-                color: config.colors.orange,
+                color: colors.embed.orange,
                 author: { name: 'Nickname Changed', icon_url: clientAvatar },
                 description: `<@${newMember.id}>\n${newMember.user.tag}`,
                 thumbnail: { url: memberAvatar },

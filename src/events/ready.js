@@ -1,6 +1,7 @@
 // const { REST } = require('@discordjs/rest');
 // const { Routes } = require('discord-api-types/v9');
-const config = require('../../config.json');
+// const config = require('../../config.json');
+const colors = require('../constants/colors.js');
 const { logChannel } = require('../constants/discord.js');
 const { findAvatar } = require('../utils/discord.js');
 
@@ -44,7 +45,7 @@ module.exports = {
         // log
         console.log('\x1b[36m%s\x1b[0m', `${client.user.username} ready!`);
         const embed = {
-            color: config.colors.blue,
+            color: colors.embed.blue,
             author: { name: `☑️ ${client.user.username} ON!`, icon_url: findAvatar(client.user) },
             description: '[xnorm-cloud](https://xnorm.cloud)',
             timestamp: new Date(),
