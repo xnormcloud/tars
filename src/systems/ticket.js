@@ -134,7 +134,11 @@ module.exports = {
                 }
                 // group id
                 else if (customerLen === 32) {
-                    customerIds = (await notion.getUsersIdsByGroupId(customer)).UsersDiscordIds;
+                    // prevent update twice in a row, already updated in interactionCreate event
+                    if (interaction === null) {
+                        notion.updateDatabase();
+                    }
+                    customerIds = (await notion.database.getUsersIdsByGroupId(customer)).UsersDiscordIds;
                     // not inside notion database
                     if (customerIds.length === 0) {
                         if (response !== null) {

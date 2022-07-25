@@ -4,7 +4,7 @@ const ticket = require('../systems/ticket.js');
 const { capitalize } = require('../utils/string.js');
 
 const isValidUser = async (member, ticketInfoCustomer) => {
-    if (ticketInfoCustomer) return await notion.userTypeById(member.id);
+    if (ticketInfoCustomer) return await notion.database.userTypeById(member.id);
     return true;
 };
 
@@ -66,8 +66,9 @@ module.exports = {
             const ticketInfo = openTicketInteractionList.find(openTicketInteraction => openTicketInteraction.id === customId);
             // TODO: reduce number of notion database calls to improve speed :)
             // if not valid user for specified ticket return
+            notion.updateDatabase();
             if (!await isValidUser(member, ticketInfo.customer)) return interaction.editReply(`${capitalize(ticketInfo.name)} ticket only available for customers`);
-            const groups = await notion.getGroupsByUserId(member.id);
+            const groups = await notion.database.getGroupsByUserId(member.id);
             // open ticket for not customer
             if (groups.length === 0) {
                 await ticket.open(ticketInfo.name, member.id, null, interaction, null);
