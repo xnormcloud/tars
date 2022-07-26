@@ -1,14 +1,13 @@
 /* eslint-disable no-unused-vars */
 const colors = require('../constants/colors.js');
-const { client, errorChannel } = require('../constants/discord.js');
-const { findAvatar } = require('../utils/discord.js');
+const { client, clientAvatar, errorChannel } = require('../constants/discord.js');
 const { codeFormat } = require('../utils/string.js');
 
 const processError = (type, reason) => {
     console.log(reason);
     const errorEmbed = {
         color: colors.embed.red,
-        author: { name: `⚠️ ${client.user.username} got an ${type} exception :(`, icon_url: findAvatar(client.user) },
+        author: { name: `⚠️ ${client.user.username} got an ${type} exception :(`, icon_url: clientAvatar },
         description: codeFormat(reason.stack),
         timestamp: new Date(),
         footer: { text: `ID: ${client.user.id}` },

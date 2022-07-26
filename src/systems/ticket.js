@@ -5,7 +5,7 @@ const colors = require('../constants/colors.js');
 const responseCodes = require('../constants/responseCodes.json');
 const notion = require('../database/notion.js');
 const hash = require('../utils/hash.js');
-const { client, guild, ticketChannel } = require('../constants/discord.js');
+const { guild, clientAvatar, ticketChannel } = require('../constants/discord.js');
 const discord = require('../utils/discord.js');
 const internal = require('../utils/internal.js');
 const { capitalize } = require('../utils/string.js');
@@ -26,7 +26,7 @@ const createTicketEmbed = (openTicketChannel, ticketInfo, locked) => {
         color: locked ? colors.embed.red : colors.embed.blue,
         author: { name: `Welcome to ${capitalize(ticketInfo.name)} Ticket` },
         description: 'Please be patient, we will answer as soon as possible.',
-        thumbnail: { url: discord.findAvatar(client.user) },
+        thumbnail: { url: clientAvatar },
         fields: [
             { name: 'Important information', value: ticketInfo.info.join('\n') },
             { name: 'Status', value: locked ? '🔒 Locked' : '🔓 Unlocked' },
@@ -86,7 +86,7 @@ module.exports = {
                 color: colors.embed.blue,
                 author: { name: 'Open Ticket Tool' },
                 description: 'Select what category you want to open a ticket inside',
-                thumbnail: { url: discord.findAvatar(client.user) },
+                thumbnail: { url: clientAvatar },
             };
             const buttons = new MessageActionRow();
             const fields = [];
@@ -230,10 +230,7 @@ module.exports = {
                         color: colors.embed.red,
                         author: {
                             name: `Transcript ${ticketType}`,
-                            icon_url: guild.members.cache.get(config.client).displayAvatarURL({
-                                size: 4096,
-                                dynamic: true,
-                            }),
+                            icon_url: clientAvatar,
                         },
                         fields: [
                             { name: 'Ticket Name', value: openTicketChannel.name },

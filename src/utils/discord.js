@@ -27,9 +27,7 @@ module.exports = {
     },
 
     isAdmin: user => {
-        if (user.permissions.has('ADMINISTRATOR')) {
-            return true;
-        }
+        if (user.permissions.has('ADMINISTRATOR')) return true;
         return false;
     },
 

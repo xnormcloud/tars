@@ -1,5 +1,5 @@
 const colors = require('../constants/colors.js');
-const { client, joinChannel, logChannel } = require('../constants/discord.js');
+const { clientAvatar, joinChannel, logChannel } = require('../constants/discord.js');
 const { findAvatar } = require('../utils/discord.js');
 
 module.exports = {
@@ -12,7 +12,7 @@ module.exports = {
         const date = new Date(member.user.createdTimestamp).toString();
         const embed = {
             color: colors.embed.green,
-            author: { name: 'Member Joined', icon_url: findAvatar(client.user) },
+            author: { name: 'Member Joined', icon_url: clientAvatar },
             description: `<@${member.id}>\n${member.user.tag}`,
             thumbnail: { url: findAvatar(member.user) },
             fields: [ { name: 'Account Creation Date', value: date.substring(0, date.length - 39) } ],
