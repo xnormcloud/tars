@@ -1,14 +1,20 @@
 // const { REST } = require('@discordjs/rest');
 // const { Routes } = require('discord-api-types/v9');
-// const config = require('../../config.json');
+const config = require('../../config.json');
 const colors = require('../constants/colors.js');
-const { logChannel } = require('../constants/discord.js');
-const { findAvatar } = require('../utils/discord.js');
+
+const findAvatar = user => {
+    return user.displayAvatarURL({ size: 4096, dynamic: true });
+};
+
+const findChannel = (client, channelId) => {
+    return client.channels.cache.find(channel => channel.id === channelId);
+};
 
 module.exports = {
     name: 'ready',
     once: true,
-    run: client => {
+    run: async client => {
         /* slash commands register
         // rest stuff
         const rest = new REST({
@@ -43,14 +49,15 @@ module.exports = {
         })();
         */
         // log
-        console.log('\x1b[36m%s\x1b[0m', `${client.user.username} ready!`);
+        console.log(colors.console.orangeReset, `[bot] ${client.user.username} ready!`);
         const embed = {
             color: colors.embed.blue,
-            author: { name: `☑️ ${client.user.username} ON!`, icon_url: findAvatar(client.user) },
+            author: { name: `✅ ${client.user.username} ON!`, icon_url: findAvatar(client.user) },
             description: '[xnorm-cloud](https://xnorm.cloud)',
             timestamp: new Date(),
             footer: { text: `ID: ${client.user.id}` },
         };
+        const logChannel = findChannel(client, config.channels.log);
         logChannel.send({ embeds: [embed] });
     },
 };

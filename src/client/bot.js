@@ -32,7 +32,8 @@ class DiscordClient extends Client {
     run() {
         this.login(discordBotToken).then(() => console.log(colors.console.orangeReset, '[bot] login step succeed'));
         // TODO: fix execute ready.js from here
-        this.once('ready', () => this.registerModules().then(() => apiClient.run()));
+        const ready = require('../events/ready.js');
+        this.once(ready.name, (...args) => ready.run(...args).then(() => this.registerModules().then(() => apiClient.run())));
     }
 
     async registerModules() {
