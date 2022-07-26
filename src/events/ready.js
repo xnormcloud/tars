@@ -1,5 +1,6 @@
 // const { REST } = require('@discordjs/rest');
 // const { Routes } = require('discord-api-types/v9');
+const argument = process.argv[2];
 const config = require('../../config.json');
 const colors = require('../constants/colors.js');
 const { findAvatar, findChannel } = require('../utils/discordnt.js');
@@ -43,6 +44,7 @@ module.exports = {
         */
         // log
         console.log(colors.console.orangeReset, `[bot] ${client.user.username} ready!`);
+        if (argument !== '-p') return;
         const embed = {
             color: colors.embed.blue,
             author: { name: `✅ ${client.user.username} ON!`, icon_url: findAvatar(client.user) },
