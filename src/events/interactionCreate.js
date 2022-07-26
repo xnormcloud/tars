@@ -1,21 +1,12 @@
 const config = require('../../config.json');
 const notion = require('../database/notion.js');
 const ticket = require('../systems/ticket.js');
+const { isArrayEmpty } = require('../utils/internal.js');
+const { isAdmin } = require('../utils/discord.js');
 const { capitalize } = require('../utils/string.js');
 
-const isValidUser = async (member, ticketInfoCustomer) => {
-    if (ticketInfoCustomer) return await notion.database.userTypeById(member.id);
-    return true;
-};
-
-const isAdmin = (member, interaction) => {
-    if (!member.permissions.has('ADMINISTRATOR')) {
-        interaction.reply({
-            content: 'You don\'t have permission to use this button.',
-            ephemeral: true,
-        });
-        return false;
-    }
+const isValidUser = async (memberId, isCustomerTicket) => {
+    if (isCustomerTicket) return await notion.database.userTypeById(memberId);
     return true;
 };
 
@@ -64,22 +55,21 @@ module.exports = {
         if (openTicketInteractionList.some(openTicketInteraction => openTicketInteraction.id === customId)) {
             await interaction.deferReply({ ephemeral: true });
             const ticketInfo = openTicketInteractionList.find(openTicketInteraction => openTicketInteraction.id === customId);
-            // TODO: reduce number of notion database calls to improve speed :)
-            // if not valid user for specified ticket return
             notion.updateDatabase();
-            if (!await isValidUser(member, ticketInfo.customer)) return interaction.editReply(`${capitalize(ticketInfo.name)} ticket only available for customers`);
+            // if not valid user for specified ticket return
+            const isCustomerTicket = ticketInfo.customer;
+            if (!await isValidUser(member, isCustomerTicket)) return interaction.editReply(`${capitalize(ticketInfo.name)} ticket only available for customers`);
             const groups = await notion.database.getGroupsByUserId(member.id);
-            // open ticket for not customer
-            if (groups.length === 0) {
-                await ticket.open(ticketInfo.name, member.id, null, interaction, null);
-            }
-            // open ticket for customer
-            else {
+            const isCustomer = isArrayEmpty(groups);
+            if (isCustomer) {
                 await ticket.open(ticketInfo.name, groups[0].id, null, interaction, null);
             }
+            else {
+                await ticket.open(ticketInfo.name, member.id, null, interaction, null);
+            }
         }
-        // inside ticket buttons
-        else if (isAdmin(member, interaction)) {
+        else if (isAdmin(member)) {
+            // inside ticket buttons
             await interaction.deferReply();
             const ticketInfoName = config.tickets.find(ticketSearch => ticketSearch.category === channel.parent.id).name;
             const channelName = channel.name;
@@ -94,6 +84,12 @@ module.exports = {
                 await ticket.alternateLock(ticketInfoName, channelName, false, interaction, null);
                 break;
             }
+        }
+        else {
+            interaction.reply({
+                content: 'You don\'t have permission to use this button.',
+                ephemeral: true,
+            });
         }
     },
 };
