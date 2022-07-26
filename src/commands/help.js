@@ -1,6 +1,5 @@
 const colors = require('../constants/colors.js');
-const { client } = require('../constants/discord.js');
-const { findAvatar } = require('../utils/discord.js');
+const { clientAvatar } = require('../constants/discord.js');
 
 module.exports = {
     name: 'help',
@@ -8,7 +7,7 @@ module.exports = {
     run: (message, commands) => {
         const embed = {
             color: colors.embed.blue,
-            thumbnail: { url: findAvatar(client) },
+            thumbnail: { url: clientAvatar },
             fields: [],
             timestamp: new Date(),
             footer: { text: `ID: ${message.member.id}` },

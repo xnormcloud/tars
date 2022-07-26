@@ -1,6 +1,5 @@
 const { Client, Collection } = require('discord.js');
 const config = require('../../config.json');
-require('dotenv').config();
 const discordBotToken = process.env.DISCORD_BOT_TOKEN;
 const { findFiles } = require('../utils/internal.js');
 const colors = require('../constants/colors.js');
@@ -18,10 +17,12 @@ class DiscordClient extends Client {
             presence: {
                 activities: [{
                     name: config.presence.activities.name,
-                    type: discordConstants.presence.activities.type[config.presence.activities.type], // [0]PLAYING, [1]STREAMING, [2]LISTENING, [3]WATCHING
+                    // [0]PLAYING, [1]STREAMING, [2]LISTENING, [3]WATCHING
+                    type: discordConstants.presence.activities.type[config.presence.activities.type],
                     url: config.url.twitch,
                 }],
-                status: discordConstants.presence.status[config.presence.status], // [0]online, [1]idle, [2]dnd, [3]offline
+                // [0]online, [1]idle, [2]dnd, [3]offline
+                status: discordConstants.presence.status[config.presence.status],
             },
         });
         // create commands collection
@@ -48,7 +49,7 @@ class DiscordClient extends Client {
         await initDiscordMessage().then(() =>
             console.log(colors.console.orangeReset, '[ticket] discord message init succeed'),
         );
-        console.log(colors.console.greenReset, '[bot] everything loaded successfully');
+        console.log(colors.console.greenReset, '[bot] everything loaded successfully!');
     }
 
 }

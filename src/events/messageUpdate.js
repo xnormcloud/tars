@@ -1,5 +1,5 @@
 const colors = require('../constants/colors.js');
-const { client, logChannel } = require('../constants/discord.js');
+const { clientAvatar, logChannel } = require('../constants/discord.js');
 const { findAvatar } = require('../utils/discord.js');
 const { codeFormat } = require('../utils/string.js');
 
@@ -16,7 +16,7 @@ module.exports = {
             // log
             const embed = {
                 color: colors.embed.orange,
-                author: { name: 'Message Edited', icon_url: findAvatar(client.user) },
+                author: { name: 'Message Edited', icon_url: clientAvatar },
                 description: `<@${newMessage.author.id}>\n${newMessage.author.tag}`,
                 thumbnail: { url: findAvatar(newMessage.author) },
                 fields: [

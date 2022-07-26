@@ -1,5 +1,5 @@
 const colors = require('../constants/colors.js');
-const { client, logChannel } = require('../constants/discord.js');
+const { clientAvatar, logChannel } = require('../constants/discord.js');
 const { findAvatar } = require('../utils/discord.js');
 
 module.exports = {
@@ -7,7 +7,6 @@ module.exports = {
     once: false,
     run: (oldMember, newMember) => {
         let cont;
-        const clientAvatar = findAvatar(client.user);
         const memberAvatar = findAvatar(newMember.user);
         // role changed
         if (oldMember._roles.length !== newMember._roles.length) {

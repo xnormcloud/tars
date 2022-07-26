@@ -5,20 +5,20 @@ const colors = require('../constants/colors.js');
 const responseCodes = require('../constants/responseCodes.json');
 const notion = require('../database/notion.js');
 const hash = require('../utils/hash.js');
-const { client, guild, ticketChannel } = require('../constants/discord.js');
-const { findAvatar } = require('../utils/discord.js');
+const { guild, clientAvatar, ticketChannel } = require('../constants/discord.js');
+const discord = require('../utils/discord.js');
+const internal = require('../utils/internal.js');
 const { capitalize } = require('../utils/string.js');
+
+const inputChecker = (interaction, message, response) => {
+    const isEvent = interaction !== null;
+    const isCommand = message !== null;
+    const isRequest = response !== null;
+    return { isEvent, isCommand, isRequest };
+};
 
 const getTicketInfo = ticketType => {
     return config.tickets.find(ticketInfo => ticketInfo.name === ticketType);
-};
-
-const exists = (ticketInfo, customerHash) => {
-    return guild.channels.cache.some(channel => channel.parentId === ticketInfo.category && channel.name === customerHash);
-};
-
-const getOpenTicketChannel = (ticketInfo, customerHash) => {
-    return guild.channels.cache.find(channel => channel.parentId === ticketInfo.category && channel.name === customerHash);
 };
 
 const createTicketEmbed = (openTicketChannel, ticketInfo, locked) => {
@@ -26,7 +26,7 @@ const createTicketEmbed = (openTicketChannel, ticketInfo, locked) => {
         color: locked ? colors.embed.red : colors.embed.blue,
         author: { name: `Welcome to ${capitalize(ticketInfo.name)} Ticket` },
         description: 'Please be patient, we will answer as soon as possible.',
-        thumbnail: { url: findAvatar(client.user) },
+        thumbnail: { url: clientAvatar },
         fields: [
             { name: 'Important information', value: ticketInfo.info.join('\n') },
             { name: 'Status', value: locked ? '🔒 Locked' : '🔓 Unlocked' },
@@ -66,6 +66,19 @@ const createTicketEmbed = (openTicketChannel, ticketInfo, locked) => {
 
 module.exports = {
 
+    getOpenInteractionList: () => {
+        // no button for invoice tickets, those are auto generated
+        return config.tickets.filter(ticketInfo => ticketInfo.name !== 'invoice').map(ticketInfo => {
+            return {
+                name: ticketInfo.name,
+                customer: ticketInfo.customer,
+                description: ticketInfo.description,
+                emoji: ticketInfo.emoji,
+                id: 'open_' + ticketInfo.name + '_ticket',
+            };
+        });
+    },
+
     initDiscordMessage: async () => {
         ticketChannel.messages.fetch({ after: 1, limit: 1 }).then(ticketMessages => {
             if (ticketMessages.size !== 0) return;
@@ -73,7 +86,7 @@ module.exports = {
                 color: colors.embed.blue,
                 author: { name: 'Open Ticket Tool' },
                 description: 'Select what category you want to open a ticket inside',
-                thumbnail: { url: findAvatar(client.user) },
+                thumbnail: { url: clientAvatar },
             };
             const buttons = new MessageActionRow();
             const fields = [];
@@ -95,49 +108,34 @@ module.exports = {
         });
     },
 
-    getOpenInteractionList: () => {
-        // no button for invoice tickets, those are auto generated
-        return config.tickets.filter(ticketInfo => ticketInfo.name !== 'invoice').map(ticketInfo => {
-            return {
-                name: ticketInfo.name,
-                customer: ticketInfo.customer,
-                description: ticketInfo.description,
-                emoji: ticketInfo.emoji,
-                id: 'open_' + ticketInfo.name + '_ticket',
-            };
-        });
-    },
-
-    isInsideDiscord: discordId => {
-        return guild.members.cache.some(member => member.id === discordId);
-    },
-
-    open: async (ticketType, customer, response, interaction, message) => {
+    open: async (ticketType, customerId, response, interaction, message) => {
+        const { isEvent, isCommand, isRequest } = inputChecker(interaction, message, response);
         const ticketInfo = getTicketInfo(ticketType);
         if (ticketInfo !== undefined) {
-            const customerHash = hash.convert(customer);
-            if (!exists(ticketInfo, customerHash)) {
-                const customerLen = customer.length;
-                let customerIds;
-                // discord id
-                if (customerLen === 18) {
+            const customerHash = hash.convert(customerId);
+            if (!discord.isChannelByName(ticketInfo.category, customerHash)) {
+                let discordIds;
+                if (internal.isDiscordId(customerId)) {
                     // inside discord
-                    if (module.exports.isInsideDiscord(customer)) {
-                        customerIds = [customer];
+                    if (discord.isMember(customerId)) {
+                        discordIds = [customerId];
                     }
                     else {
-                        if (response !== null) {
+                        if (isRequest) {
                             response.code = responseCodes.notFound;
                         }
                         return;
                     }
                 }
-                // group id
-                else if (customerLen === 32) {
-                    customerIds = (await notion.getUsersIdsByGroupId(customer)).UsersDiscordIds;
+                else if (internal.isNotionId(customerId)) {
+                    // prevent update twice in a row, already updated in interactionCreate event
+                    if (!isEvent) {
+                        notion.updateDatabase();
+                    }
+                    discordIds = (await notion.database.getUsersIdsByGroupId(customerId)).UsersDiscordIds;
                     // not inside notion database
-                    if (customerIds.length === 0) {
-                        if (response !== null) {
+                    if (internal.isArrayEmpty(discordIds)) {
+                        if (isRequest) {
                             response.code = responseCodes.notFound;
                         }
                         return;
@@ -145,7 +143,7 @@ module.exports = {
                 }
                 // not valid id
                 else {
-                    if (response !== null) {
+                    if (isRequest) {
                         response.code = responseCodes.badRequest;
                     }
                     return;
@@ -156,8 +154,8 @@ module.exports = {
                         await channel.setParent(ticketInfo.category).then(async openTicketChannel => {
                             const [embed, buttons] = createTicketEmbed(openTicketChannel, ticketInfo, false);
                             await openTicketChannel.send({ embeds: [embed], components: [buttons] }).then(async () => {
-                                for (const customerId of customerIds) {
-                                    const customerDiscord = guild.members.cache.find(member => member.id === customerId);
+                                for (const discordId of discordIds) {
+                                    const customerDiscord = discord.findMember(discordId);
                                     if (customerDiscord !== undefined) {
                                         await openTicketChannel.permissionOverwrites.edit(customerDiscord, {
                                             VIEW_CHANNEL: true,
@@ -165,14 +163,14 @@ module.exports = {
                                         });
                                     }
                                 }
-                                if (response != null) {
+                                if (isRequest) {
                                     response.code = responseCodes.ok;
-                                    response.channelLink = `https://discord.com/channels/${guild.id}/${openTicketChannel.id}`;
+                                    response.channelLink = discord.generateChannelUrl(openTicketChannel.id);
                                 }
-                                else if (interaction != null) {
+                                else if (isEvent) {
                                     interaction.editReply(`${capitalize(ticketInfo.name)} Ticket <#${openTicketChannel.id}> successfully opened!`);
                                 }
-                                else if (message != null) {
+                                else if (isCommand) {
                                     message.reply(`Ticket successfully opened in ${ticketInfo.name} category!`);
                                 }
                             });
@@ -180,15 +178,15 @@ module.exports = {
                     });
                 }
                 catch (e) {
-                    if (response != null) {
+                    if (isRequest) {
                         response.code = responseCodes.internalServerError;
                     }
                     else {
                         const display_message = 'There was a problem opening the ticket';
-                        if (interaction != null) {
+                        if (isEvent) {
                             interaction.editReply(display_message);
                         }
-                        else if (message != null) {
+                        else if (isCommand) {
                             message.reply(display_message);
                         }
                     }
@@ -196,31 +194,32 @@ module.exports = {
                 }
             }
             else {
-                const openTicketChannelId = getOpenTicketChannel(ticketInfo, customerHash).id;
-                if (response != null) {
+                const openTicketChannelId = discord.findChannelByName(ticketInfo.category, customerHash).id;
+                if (isRequest) {
                     response.code = responseCodes.found;
-                    response.channelLink = `https://discord.com/channels/${guild.id}/${openTicketChannelId}`;
+                    response.channelLink = discord.generateChannelUrl(openTicketChannelId);
                 }
-                else if (interaction != null) {
+                else if (isEvent) {
                     interaction.editReply(`You already have a ${capitalize(ticketInfo.name)} Ticket <#${openTicketChannelId}> opened!`);
                 }
-                else if (message != null) {
+                else if (isCommand) {
                     message.reply(`Already existing channel <#${openTicketChannelId}> in ${ticketInfo.name} category!`);
                 }
             }
         }
-        else if (message != null) {
+        else if (isCommand) {
             message.reply(`${ticketType} category doesn't exists!`);
         }
     },
 
     close: async (ticketType, customerHash, interaction, message) => {
+        const { isEvent, isCommand } = inputChecker(interaction, message);
         const ticketInfo = getTicketInfo(ticketType);
         if (ticketInfo !== undefined) {
-            if (exists(ticketInfo, customerHash)) {
+            if (discord.isChannelByName(ticketInfo.category, customerHash)) {
                 try {
-                    const openTicketChannel = getOpenTicketChannel(ticketInfo, customerHash);
-                    const transcriptChannel = guild.channels.cache.find(channel => channel.id === ticketInfo.log);
+                    const openTicketChannel = discord.findChannelByName(ticketInfo.category, customerHash);
+                    const transcriptChannel = discord.findChannel(ticketInfo.log);
                     const date = new Date();
                     const transcript = await createTranscript(openTicketChannel, {
                         limit: -1,
@@ -231,10 +230,7 @@ module.exports = {
                         color: colors.embed.red,
                         author: {
                             name: `Transcript ${ticketType}`,
-                            icon_url: guild.members.cache.get(config.client).displayAvatarURL({
-                                size: 4096,
-                                dynamic: true,
-                            }),
+                            icon_url: clientAvatar,
                         },
                         fields: [
                             { name: 'Ticket Name', value: openTicketChannel.name },
@@ -247,12 +243,12 @@ module.exports = {
                         footer: { text: `ID: ${customerHash}` },
                     };
                     transcriptChannel.send({ embeds: [embed], files: [transcript] });
-                    if (interaction != null) {
+                    if (isEvent) {
                         interaction.editReply('🔐 Ticket will be closed in 5 seconds!');
                     }
                     setTimeout(() => {
                         openTicketChannel.delete().then(() => {
-                            if (message != null) {
+                            if (isCommand) {
                                 message.reply(`Channel successfully closed from ${ticketInfo.name} category!`);
                             }
                         });
@@ -260,20 +256,20 @@ module.exports = {
                 }
                 catch (error) {
                     const display_message = 'There was a problem closing the ticket';
-                    if (interaction != null) {
+                    if (isEvent) {
                         interaction.editReply(display_message);
                     }
-                    else if (message != null) {
+                    else if (isCommand) {
                         message.reply(display_message);
                     }
                     console.error(error);
                 }
             }
-            else if (message != null) {
+            else if (isCommand) {
                 message.reply(`No provided customer channel in ${ticketInfo.name} category!`);
             }
         }
-        else if (message != null) {
+        else if (isCommand) {
             message.reply(`${ticketType} category doesn't exists!`);
         }
     },
@@ -281,11 +277,12 @@ module.exports = {
     alternateLock: async (ticketType, customerHash, lock, interaction, message) => {
         // lock = true => lock ticket
         // lock = false => unlock ticket
+        const { isEvent, isCommand } = inputChecker(interaction, message);
         const ticketInfo = getTicketInfo(ticketType);
         if (ticketInfo !== undefined) {
-            if (exists(ticketInfo, customerHash)) {
+            if (discord.isChannelByName(ticketInfo.category, customerHash)) {
                 try {
-                    const openTicketChannel = getOpenTicketChannel(ticketInfo, customerHash);
+                    const openTicketChannel = discord.findChannelByName(ticketInfo.category, customerHash);
                     const customerIds = openTicketChannel.permissionOverwrites.cache.filter(member => member.type === 'member').map(member => {
                         return member.id;
                     });
@@ -302,10 +299,10 @@ module.exports = {
                         const [embed, buttons] = createTicketEmbed(openTicketChannel, ticketInfo, lock);
                         embedTicketMessage.edit({ embeds: [embed], components: [buttons] }).then(() => {
                             const display_message = (lock ? '🔒' : '🔓') + ' Ticket ' + (lock ? 'locked' : 'unlocked') + '!';
-                            if (interaction != null) {
+                            if (isEvent) {
                                 interaction.editReply(display_message);
                             }
-                            else if (message != null) {
+                            else if (isCommand) {
                                 message.reply(display_message);
                             }
                         });
@@ -313,20 +310,20 @@ module.exports = {
                 }
                 catch (error) {
                     const display_message = 'There was a problem ' + (lock ? 'locking' : 'unlocking') + ' the ticket';
-                    if (interaction != null) {
+                    if (isEvent) {
                         interaction.editReply(display_message);
                     }
-                    else if (message != null) {
+                    else if (isCommand) {
                         message.reply(display_message);
                     }
                     console.error(error);
                 }
             }
-            else if (message != null) {
+            else if (isCommand) {
                 message.reply(`No provided customer channel in ${ticketInfo.name} category!`);
             }
         }
-        else if (message != null) {
+        else if (isCommand) {
             message.reply(`${ticketType} category doesn't exists!`);
         }
     },

@@ -1,5 +1,4 @@
 const bcrypt = require('bcrypt');
-require('dotenv').config();
 const hashSalt = process.env.HASH_SALT;
 
 module.exports = {
