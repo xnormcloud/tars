@@ -2,14 +2,7 @@
 // const { Routes } = require('discord-api-types/v9');
 const config = require('../../config.json');
 const colors = require('../constants/colors.js');
-
-const findAvatar = user => {
-    return user.displayAvatarURL({ size: 4096, dynamic: true });
-};
-
-const findChannel = (client, channelId) => {
-    return client.channels.cache.find(channel => channel.id === channelId);
-};
+const { findAvatar, findChannel } = require('../utils/discordnt.js');
 
 module.exports = {
     name: 'ready',
