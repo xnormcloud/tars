@@ -58,9 +58,9 @@ module.exports = {
             notion.updateDatabase();
             // if not valid user for specified ticket return
             const isCustomerTicket = ticketInfo.customer;
-            if (!await isValidUser(member, isCustomerTicket)) return interaction.editReply(`${capitalize(ticketInfo.name)} ticket only available for customers`);
+            if (!await isValidUser(member.id, isCustomerTicket)) return interaction.editReply(`${capitalize(ticketInfo.name)} ticket only available for customers`);
             const groups = await notion.database.getGroupsByUserId(member.id);
-            const isCustomer = isArrayEmpty(groups);
+            const isCustomer = !isArrayEmpty(groups);
             if (isCustomer) {
                 await ticket.open(ticketInfo.name, groups[0].id, null, interaction, null);
             }
