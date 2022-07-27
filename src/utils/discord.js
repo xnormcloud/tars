@@ -1,6 +1,9 @@
 const { guild } = require('../constants/discord.js');
+const { findAvatar } = require('./discordnt.js');
 
 module.exports = {
+
+    findAvatar,
 
     findChannel: channelId => {
         return guild.channels.cache.find(channel => channel.id === channelId);
@@ -29,10 +32,6 @@ module.exports = {
     isAdmin: user => {
         if (user.permissions.has('ADMINISTRATOR')) return true;
         return false;
-    },
-
-    findAvatar: user => {
-        return user.displayAvatarURL({ size: 4096, dynamic: true });
     },
 
     generateChannelUrl: channelId => {
