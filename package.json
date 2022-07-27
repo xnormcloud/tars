@@ -1,6 +1,6 @@
 {
   "name": "tars",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Rest api discord bot for xnormcloud behaviour",
   "main": "src/app.js",
   "repository": "git@github.com:xnormnet/tars.git",
