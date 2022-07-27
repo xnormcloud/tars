@@ -1,20 +1,20 @@
-const config = require('../config/config.json');
+const colors = require('../constants/colors.js');
+const { clientAvatar, logChannel } = require('../constants/discord.js');
+const { findAvatar } = require('../utils/discord.js');
 
 module.exports = {
     name: 'guildMemberRemove',
     once: false,
-    run(member) {
+    run: member => {
         // log
-        const avatar = member.user.displayAvatarURL({ size: 4096, dynamic: true });
-        const logchannel = member.guild.channels.cache.get(config.channels.log);
         const embed = {
-            color: config.colors.red,
-            author: { name: 'Member Left', icon_url: avatar },
+            color: colors.embed.red,
+            author: { name: 'Member Left', icon_url: clientAvatar },
             description: `<@${member.id}>\n${member.user.tag}`,
-            thumbnail: { url: avatar },
+            thumbnail: { url: findAvatar(member.user) },
             timestamp: new Date(),
             footer: { text: `ID: ${member.id}` },
         };
-        logchannel.send({ embeds: [embed] });
+        logChannel.send({ embeds: [embed] });
     },
 };

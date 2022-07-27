@@ -1,26 +1,33 @@
-const config = require('../config/config.json');
+const colors = require('../constants/colors.js');
+const { clientAvatar, logChannel } = require('../constants/discord.js');
+const { findAvatar } = require('../utils/discord.js');
+const { codeFormat } = require('../utils/string.js');
 
 module.exports = {
     name: 'messageUpdate',
     once: false,
-    run(oldMessage, newMessage) {
+    run: (oldMessage, newMessage) => {
+        // prevents crashing if message content is empty
+        if (oldMessage.content === '' || newMessage.content === '') return;
+        // prevents crashing if message is rly long
+        if (oldMessage.content.length > 1024 || newMessage.content.length > 1024) return;
         // checks if it's a content change
         if (newMessage.content !== oldMessage.content) {
             // log
-            const avatar = newMessage.author.displayAvatarURL({ size: 4096, dynamic: true });
-            const logchannel = newMessage.guild.channels.cache.get(config.channels.log);
             const embed = {
-                color: config.colors.orange,
-                author: { name: 'Message Edited', icon_url: avatar },
+                color: colors.embed.orange,
+                author: { name: 'Message Edited', icon_url: clientAvatar },
                 description: `<@${newMessage.author.id}>\n${newMessage.author.tag}`,
+                thumbnail: { url: findAvatar(newMessage.author) },
                 fields: [
-                    { name: 'New Message', value: newMessage.content },
-                    { name: 'Old Message', value: oldMessage.content },
+                    { name: 'Old', value: codeFormat(oldMessage.content) },
+                    { name: 'New', value: codeFormat(newMessage.content) },
+                    { name: 'Channel', value: `<#${newMessage.channel.id}>` },
                 ],
                 timestamp: new Date(),
                 footer: { text: `ID: ${newMessage.author.id}` },
             };
-            logchannel.send({ embeds: [embed] });
+            logChannel.send({ embeds: [embed] });
         }
     },
 };

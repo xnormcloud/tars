@@ -1,0 +1,73 @@
+{
+    "prefix": "COMMANDS PREFIX",
+    "guild": "GUILD ID",
+    "client": "BOT ID",
+    "channels": {
+        "join": "JOIN CHANNEL ID",
+        "ticket": "OPEN TICKET CHANNEL ID",
+        "log": "GENERAL LOG CHANNEL ID",
+        "error": "ERROR LOG CHANNEL ID"
+    },
+    "url": {
+        "net": ".NET WEBSITE",
+        "cloud": ".CLOUD WEBSITE",
+        "twitch": "TWITCH CHANNEL"
+    },
+    "presence": {
+        "activities": {
+            "name": "ACTIVITY NAME",
+            "type": 0
+        },
+        "status": 0
+    },
+    "tickets": [
+        {
+            "name": "information",
+            "customer": false,
+            "category": "INFORMATION CATEGORY ID",
+            "log": "INFORMATION LOG CHANNEL ID",
+            "description": "INFORMATION DESCRIPTION",
+            "emoji": "INFORMATION EMOJI",
+            "info": [
+                "information ticket",
+                "next line :)"
+            ]
+        },
+        {
+            "name": "order",
+            "customer": false,
+            "category": "ORDER CATEGORY ID",
+            "log": "ORDER LOG CHANNEL ID",
+            "description": "ORDER DESCRIPTION",
+            "emoji": "ORDER EMOJI",
+            "info": [
+                "order ticket",
+                "next line :)"
+            ]
+        },
+        {
+            "name": "support",
+            "customer": true,
+            "category": "SUPPORT CATEGORY ID",
+            "log": "SUPPORT LOG CHANNEL ID",
+            "description": "SUPPORT DESCRIPTION",
+            "emoji": "SUPPORT EMOJI",
+            "info": [
+                "support ticket",
+                "next line :)"
+            ]
+        },
+        {
+            "name": "invoice",
+            "customer": true,
+            "category": "INVOICE CATEGORY ID",
+            "log": "INVOICE LOG CHANNEL ID",
+            "description": "INVOICE DESCRIPTION",
+            "emoji": "INVOICE EMOJI",
+            "info": [
+                "invoice ticket",
+                "next line :)"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,7 @@
+{
+    "ok": "200",
+    "found": "302",
+    "badRequest": "400",
+    "notFound": "404",
+    "internalServerError": "500"
+}

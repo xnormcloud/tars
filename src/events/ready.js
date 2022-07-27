@@ -1,11 +1,14 @@
 // const { REST } = require('@discordjs/rest');
 // const { Routes } = require('discord-api-types/v9');
-const config = require('../config/config.json');
+const argument = process.argv[2];
+const config = require('../../config.json');
+const colors = require('../constants/colors.js');
+const { findAvatar, findChannel } = require('../utils/discordnt.js');
 
 module.exports = {
     name: 'ready',
     once: true,
-    run(client) {
+    run: async client => {
         /* slash commands register
         // rest stuff
         const rest = new REST({
@@ -27,7 +30,7 @@ module.exports = {
                 // discord server mode
                 else {
                     await rest.put(
-                        Routes.applicationGuildCommands(client.user.id, config.guildid),
+                        Routes.applicationGuildCommands(client.user.id, config.guild),
                         {
                             body: commands,
                         },
@@ -40,15 +43,16 @@ module.exports = {
         })();
         */
         // log
-        console.log('\x1b[36m%s\x1b[0m', `${client.user.username} ready!`);
-        const logchannel = client.channels.cache.find(channel => channel.id === config.channels.log);
+        console.log(colors.console.orangeReset, `[bot] ${client.user.username} ready!`);
+        if (argument !== '-p') return;
         const embed = {
-            color: config.colors.blue,
-            author: { name: `☑️ ${client.user.username} ON!`, icon_url: client.user.displayAvatarURL({ size: 4096, dynamic: true }) },
+            color: colors.embed.blue,
+            author: { name: `✅ ${client.user.username} ON!`, icon_url: findAvatar(client.user) },
             description: '[xnorm-cloud](https://xnorm.cloud)',
             timestamp: new Date(),
             footer: { text: `ID: ${client.user.id}` },
         };
-        logchannel.send({ embeds: [embed] });
+        const logChannel = findChannel(client, config.channels.log);
+        logChannel.send({ embeds: [embed] });
     },
 };
